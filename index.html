@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controller PvP | Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #090b0e;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .brutalist-card {
+      background: #11161d;
+      border: 2px solid #1e293b;
+      box-shadow: 4px 4px 0px #000;
+    }
+    .brutalist-btn {
+      background: #1e293b;
+      border: 2px solid #334155;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.1s ease;
+    }
+    .brutalist-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #000;
+    }
+    .brutalist-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+    /* Tier Accent Colors */
+    .tier-S { color: #FFD700; border-color: #FFD700; }
+    .tier-A { color: #38BDF8; border-color: #38BDF8; }
+    .tier-B { color: #C0C0C0; border-color: #C0C0C0; }
+    .tier-C { color: #CD7F32; border-color: #CD7F32; }
+    .tier-D { color: #6B7280; border-color: #6B7280; }
+    
+    .bg-tier-S { background-color: #FFD700; color: #000; }
+    .bg-tier-A { background-color: #38BDF8; color: #000; }
+    .bg-tier-B { background-color: #C0C0C0; color: #000; }
+    .bg-tier-C { background-color: #CD7F32; color: #000; }
+    .bg-tier-D { background-color: #4B5563; color: #fff; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
+
+  <!-- TOP HEADER -->
+  <header class="brutalist-card p-3 mb-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="https://cdn.discordapp.com/attachments/1550263119983546448/1562282042056646717/controller_trans.png?ex=6ad96c08&is=6ad81a88&hm=a8e107dc460a2f783808828c3e94449eb1198400f5f180aa9544b0258ddf9ae6&" 
+           alt="Controller Logo" 
+           class="h-10 w-10 object-contain"
+           onerror="this.onerror=null; this.src='https://render.crafty.gg/3d/bust/2fach';">
+      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP</h1>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex items-center gap-2">
+      <button onclick="switchTab('home')" id="tab-home" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-slate-700 text-white">Home</button>
+      <button onclick="switchTab('info')" id="tab-info" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Info</button>
+      <button onclick="switchTab('tierlist')" id="tab-tierlist" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Tierlist</button>
+    </nav>
+  </header>
+
+  <!-- HOME VIEW -->
+  <main id="view-home" class="space-y-6">
+    <!-- TOP PODIUM SECTION -->
+    <section class="brutalist-card p-4 sm:p-6 text-center">
+      <h2 class="text-xs font-black text-amber-400 tracking-widest uppercase mb-1">Supported by Controller Creators</h2>
+      <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">👑 Top Players Podium 👑</h3>
+
+      <div class="flex justify-center items-end gap-2 sm:gap-6 min-h-[220px]">
+        <!-- #2 Rank -->
+        <div class="flex flex-col items-center w-24 sm:w-32">
+          <img id="podium-2-img" src="https://render.crafty.gg/3d/bust/2fach" class="h-24 sm:h-32 object-contain mb-2 drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="2nd Place">
+          <div class="w-full bg-slate-300 text-slate-900 font-black py-2 border-2 border-slate-400 shadow-[2px_2px_0px_#000]">2</div>
+          <span id="podium-2-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full">---</span>
+          <span id="podium-2-pts" class="text-[10px] sm:text-xs text-slate-400 border border-slate-700 px-2 py-0.5 mt-1">0 PTS</span>
+        </div>
+
+        <!-- #1 Rank -->
+        <div class="flex flex-col items-center w-28 sm:w-36 -mt-6">
+          <i class="fa-solid fa-crown text-amber-400 text-xl mb-1 animate-bounce"></i>
+          <img id="podium-1-img" src="https://render.crafty.gg/3d/bust/2fach" class="h-28 sm:h-40 object-contain mb-2 drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]" alt="1st Place">
+          <div class="w-full bg-amber-400 text-black font-black py-3 border-2 border-amber-300 shadow-[3px_3px_0px_#000] text-lg">1</div>
+          <span id="podium-1-name" class="font-bold text-sm sm:text-base mt-2 truncate w-full text-amber-400">---</span>
+          <span id="podium-1-pts" class="text-xs text-amber-400 border border-amber-400/40 px-2 py-0.5 mt-1 font-bold">0 PTS</span>
+        </div>
+
+        <!-- #3 Rank -->
+        <div class="flex flex-col items-center w-24 sm:w-32">
+          <img id="podium-3-img" src="https://render.crafty.gg/3d/bust/2fach" class="h-20 sm:h-28 object-contain mb-2 drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="3rd Place">
+          <div class="w-full bg-amber-700 text-amber-100 font-black py-1.5 border-2 border-amber-600 shadow-[2px_2px_0px_#000]">3</div>
+          <span id="podium-3-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full">---</span>
+          <span id="podium-3-pts" class="text-[10px] sm:text-xs text-slate-400 border border-slate-700 px-2 py-0.5 mt-1">0 PTS</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK ACTIONS / DISCORD -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="brutalist-card p-5 flex flex-col justify-between items-start gap-4">
+        <div>
+          <h4 class="font-black text-lg uppercase flex items-center gap-2"><i class="fa-brands fa-discord text-indigo-400"></i> Join the Community</h4>
+          <p class="text-xs text-slate-400 mt-1">Challenge top players, arrange tiertests, and stay updated on competitive tournaments.</p>
+        </div>
+        <a href="https://discord.gg/5dNTzEe8x" target="_blank" class="brutalist-btn bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider flex items-center gap-2">
+          Join Controller Discord <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="brutalist-card p-5 flex flex-col justify-between items-start gap-4">
+        <div>
+          <h4 class="font-black text-lg uppercase flex items-center gap-2"><i class="fa-solid fa-book text-amber-400"></i> Rules & Guidelines</h4>
+          <p class="text-xs text-slate-400 mt-1">Review competitive rules for Java and Bedrock gamemodes before requesting fights.</p>
+        </div>
+        <button onclick="switchTab('info')" class="brutalist-btn bg-slate-800 hover:bg-slate-700 text-xs font-bold px-4 py-2 uppercase tracking-wider flex items-center gap-2">
+          View Rules & Info <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- INFO VIEW -->
+  <main id="view-info" class="hidden space-y-6">
+    <div class="brutalist-card p-6">
+      <h2 class="text-xl font-black uppercase mb-4 border-b border-slate-800 pb-2 text-amber-400"><i class="fa-solid fa-gavel"></i> General Rules</h2>
+      <ul class="text-xs sm:text-sm space-y-2 text-slate-300 list-disc pl-5">
+        <li>The fights must be watched and scored by an official tier tester.</li>
+        <li>No cheat clients, proxies, or anything that modifies gameplay directly for an unfair advantage.</li>
+        <li>No boosted sensitivity with any method on Bedrock. Modified deadzones and curves are allowed.</li>
+        <li>You are allowed to remap buttons (like back buttons), but you cannot hit or place with 2 buttons, or use macro configurations to execute multiple inputs simultaneously.</li>
+        <li>If hackusated and a comp hoster agrees to host a screenshare/practical/handcam, you must comply or your fight will be invalidated.</li>
+        <li>Double clicking is not allowed. Use DC prevent in fights or use a controller that doesn't double click.</li>
+        <li>If score ties across regions, the 2 players will share the leaderboard spot.</li>
+        <li>Do not intentionally continue attacking if the opponent is clearly lagging or AFK.</li>
+      </ul>
+
+      <h2 class="text-xl font-black uppercase mt-8 mb-4 border-b border-slate-800 pb-2 text-sky-400"><i class="fa-brands fa-java"></i> Java Rules (Neutral Ping)</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">Sword & Pot</h3>
+          <p>First to 3 full matches wins.</p>
+        </div>
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">SMP & Mace</h3>
+          <p>First to 2 full matches wins. Shield status mod is permitted.</p>
+        </div>
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">Crystal</h3>
+          <p>First to 3 full matches wins. Max 14 totems. No turtle master potions. Kit items adhere to PvPtiers kit standards.</p>
+        </div>
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">UHC</h3>
+          <p>First to 3 full matches wins. Shield status mod is permitted.</p>
+        </div>
+      </div>
+
+      <h2 class="text-xl font-black uppercase mt-8 mb-4 border-b border-slate-800 pb-2 text-emerald-400"><i class="fa-solid fa-cubes"></i> Bedrock Rules</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">Skywars</h3>
+          <p>Played on Swimgg.club (Hive backup). Hotkeys not allowed. First to 5 wins (same region) or First to 3 wins on both regions.</p>
+        </div>
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">Nodebuff</h3>
+          <p>Played on Tidalpvp.club (Swimgg.club backup). First to 5 wins (same region) or First to 3 wins on both regions.</p>
+        </div>
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">Midfights</h3>
+          <p>Played on Swimgg.club (Hive backup). First to 3 full match wins (same region) or First to 2 match wins on both regions.</p>
+        </div>
+        <div class="brutalist-card p-3">
+          <h3 class="font-bold text-white uppercase mb-1">Bridging</h3>
+          <p>Live tiertest host required. Max 3 minutes per bridge attempt. No modified clicking or boosted sensitivity.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- TIERLIST VIEW -->
+  <main id="view-tierlist" class="hidden space-y-6">
+    <!-- Mode & Region Selectors -->
+    <div class="brutalist-card p-4 flex flex-wrap gap-4 items-center justify-between">
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-bold uppercase text-slate-400">Mode:</label>
+        <select id="mode-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase">
+          <optgroup label="Java">
+            <option value="sword">Sword</option>
+            <option value="smp">SMP</option>
+            <option value="crystal">Crystal</option>
+            <option value="mace">Mace</option>
+            <option value="uhc">UHC</option>
+            <option value="pot">Pot</option>
+          </optgroup>
+          <optgroup label="Bedrock">
+            <option value="skywars">Skywars</option>
+            <option value="nodebuff">Nodebuff</option>
+            <option value="midfights">Midfights</option>
+            <option value="bridging">Bridging</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-bold uppercase text-slate-400">Region:</label>
+        <select id="region-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase">
+          <option value="ALL">Global (All)</option>
+          <option value="NA">North America (NA)</option>
+          <option value="EU">Europe (EU)</option>
+          <option value="AS">Asia (AS)</option>
+          <option value="SA">South America (SA)</option>
+          <option value="OCE">Oceania (OCE)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tiers Container -->
+    <div id="tiers-container" class="space-y-4">
+      <!-- Tier rows render dynamically via JavaScript -->
+    </div>
+  </main>
+
+  <script>
+    const DEFAULT_DATA = {
+      players: [
+        { name: "Tynza", region: "NA", tiers: { sword: "High S", smp: "High S", crystal: "High S" } }
+      ]
+    };
+
+    function getData() {
+      const stored = localStorage.getItem('controller_pvp_data');
+      return stored ? JSON.parse(stored) : DEFAULT_DATA;
+    }
+
+    function switchTab(tab) {
+      ['home', 'info', 'tierlist'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).classList.remove('bg-slate-700', 'text-white');
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).classList.add('bg-slate-700', 'text-white');
+      if (tab === 'tierlist') renderTierlist();
+    }
+
+    function calculatePoints(player) {
+      if (!player.tiers) return 0;
+      const pointsMap = { 
+        'High S': 100, 'Low S': 90, 
+        'High A': 80, 'Low A': 70, 
+        'High B': 60, 'Low B': 50, 
+        'High C': 40, 'Low C': 30, 
+        'High D': 20, 'Low D': 10 
+      };
+      return Object.values(player.tiers).reduce((sum, tier) => sum + (pointsMap[tier] || 0), 0);
+    }
+
+    function renderPodium() {
+      const data = getData();
+
+      // Sort players by total points in descending order
+      const sortedPlayers = [...data.players].sort((a, b) => calculatePoints(b) - calculatePoints(a));
+
+      // Get top 3 players after sorting
+      const top3 = sortedPlayers.slice(0, 3);
+
+      [1, 2, 3].forEach((rank, index) => {
+        const player = top3[index];
+        const imgEl = document.getElementById(`podium-${rank}-img`);
+        const nameEl = document.getElementById(`podium-${rank}-name`);
+        const ptsEl = document.getElementById(`podium-${rank}-pts`);
+
+        if (player) {
+          imgEl.src = `https://render.crafty.gg/3d/bust/${player.name}`;
+          imgEl.onerror = () => { imgEl.src = 'https://render.crafty.gg/3d/bust/2fach'; };
+          nameEl.textContent = player.name;
+          ptsEl.textContent = `${calculatePoints(player)} PTS`;
+        } else {
+          imgEl.src = 'https://render.crafty.gg/3d/bust/2fach';
+          nameEl.textContent = '---';
+          ptsEl.textContent = '0 PTS';
+        }
+      });
+    }
+
+    function renderTierlist() {
+      const data = getData();
+      const selectedMode = document.getElementById('mode-select').value;
+      const selectedRegion = document.getElementById('region-select').value;
+      const container = document.getElementById('tiers-container');
+      container.innerHTML = '';
+
+      const tierDefs = [
+        { code: 'S', name: 'S Tier', colorClass: 'tier-S', bgClass: 'bg-tier-S' },
+        { code: 'A', name: 'A Tier', colorClass: 'tier-A', bgClass: 'bg-tier-A' },
+        { code: 'B', name: 'B Tier', colorClass: 'tier-B', bgClass: 'bg-tier-B' },
+        { code: 'C', name: 'C Tier', colorClass: 'tier-C', bgClass: 'bg-tier-C' },
+        { code: 'D', name: 'D Tier', colorClass: 'tier-D', bgClass: 'bg-tier-D' },
+      ];
+
+      tierDefs.forEach(tier => {
+        const subTiers = [`High ${tier.code}`, `Low ${tier.code}`];
+        let subTierHTML = '';
+
+        subTiers.forEach(sub => {
+          const matchingPlayers = data.players.filter(p => {
+            const matchesMode = p.tiers && p.tiers[selectedMode] === sub;
+            const matchesRegion = selectedRegion === 'ALL' || p.region === selectedRegion;
+            return matchesMode && matchesRegion;
+          });
+
+          let playerCards = matchingPlayers.map(p => `
+            <div class="brutalist-card p-2 flex items-center gap-2 bg-slate-900/90 w-36">
+              <img src="https://render.crafty.gg/3d/bust/${p.name}" class="h-8 w-8 object-contain" onerror="this.src='https://render.crafty.gg/3d/bust/2fach'">
+              <div class="overflow-hidden">
+                <div class="font-bold text-xs truncate">${p.name}</div>
+                <div class="text-[10px] text-slate-400 font-mono">${p.region || 'NA'}</div>
+              </div>
+            </div>
+          `).join('');
+
+          if (matchingPlayers.length === 0) {
+            playerCards = `<span class="text-xs text-slate-600 italic p-2">None</span>`;
+          }
+
+          subTierHTML += `
+            <div class="p-3 border-b border-slate-800/80 last:border-b-0">
+              <span class="text-xs font-black uppercase text-slate-400 block mb-2">${sub}</span>
+              <div class="flex flex-wrap gap-2">${playerCards}</div>
+            </div>
+          `;
+        });
+
+        container.innerHTML += `
+          <div class="brutalist-card overflow-hidden">
+            <div class="px-4 py-2 font-black uppercase text-sm ${tier.bgClass} flex justify-between items-center">
+              <span>${tier.name}</span>
+            </div>
+            ${subTierHTML}
+          </div>
+        `;
+      });
+    }
+
+    // Auto-update dashboard when changes are made in admin.html tab
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'controller_pvp_data') {
+        renderPodium();
+        renderTierlist();
+      }
+    });
+
+    // Initialize View
+    renderPodium();
+  </script>
+</body>
+</html>
