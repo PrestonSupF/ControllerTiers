@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -6,10 +6,10 @@ export default async function handler(req, res) {
   const { player } = req.body;
   const GITHUB_OWNER = 'PrestonSupF';
   const GITHUB_REPO = 'ControllerTiers';
-  const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Stored securely on Vercel backend
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
   if (!GITHUB_TOKEN) {
-    return res.status(500).json({ error: 'Server GitHub token is not configured.' });
+    return res.status(500).json({ error: 'Server GitHub token is not configured in Vercel.' });
   }
 
   const filePath = `tierlist/${player.name.toLowerCase()}.json`;
@@ -54,4 +54,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
+};
