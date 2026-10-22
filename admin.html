@@ -141,10 +141,6 @@
   <script>
     const PASSCODE = 'control';
 
-    const GITHUB_OWNER = 'PrestonSupF';
-    const GITHUB_REPO = 'ControllerTiers';
-    const GITHUB_TOKEN = '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';
-
     function authenticate(e) {
       e.preventDefault();
       const input = document.getElementById('passcode-input').value;
@@ -195,47 +191,22 @@
     }
 
     async function savePlayerToGitHub(player) {
-      const filePath = `tierlist/${player.name.toLowerCase()}.json`;
-      const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
-      
-      const jsonString = JSON.stringify(player, null, 2);
-      const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
-
       try {
-        let sha = null;
-        const checkRes = await fetch(url, {
-          headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        const res = await fetch('/api/save-tier', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ player })
         });
 
-        if (checkRes.ok) {
-          const checkData = await checkRes.json();
-          sha = checkData.sha;
-        }
-
-        const body = {
-          message: `Update tier data for ${player.name}`,
-          content: contentBase64,
-          ...(sha && { sha })
-        };
-
-        const saveRes = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
-        });
-
-        if (saveRes.ok) {
+        const result = await res.json();
+        if (res.ok) {
           showStatus();
         } else {
-          const errData = await saveRes.json();
-          alert(`GitHub Commit Error: ${errData.message || 'Check repository settings'}`);
+          alert(`GitHub Error: ${result.error || 'Unknown error'}`);
         }
       } catch (err) {
         console.error('Failed to save to GitHub:', err);
-        alert('Failed to connect to GitHub API.');
+        alert('Failed to connect to backend server.');
       }
     }
 
