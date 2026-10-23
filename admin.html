@@ -44,9 +44,16 @@
       <h2 class="text-sm font-black uppercase text-slate-400">Player Management</h2>
       
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="sm:col-span-2">
+        <div>
           <label class="text-xs font-bold text-slate-300">Player Username</label>
           <input type="text" id="player-name" placeholder="e.g. Tynza" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-300">Platform</label>
+          <select id="player-platform" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
+            <option value="java">Java Edition</option>
+            <option value="bedrock">Bedrock Edition</option>
+          </select>
         </div>
         <div>
           <label class="text-xs font-bold text-slate-300">Region</label>
@@ -133,50 +140,20 @@
       location.reload();
     }
 
-    // CORS-bypassing ID resolver
-    async function resolvePlayerIdentifier(username) {
-      // 1. Try Ashcon API (CORS-friendly Mojang wrapper for Java UUIDs)
-      try {
-        const ashconRes = await fetch(`https://api.ashcon.app/mojang/v2/user/${username}`);
-        if (ashconRes.ok) {
-          const ashconData = await ashconRes.json();
-          if (ashconData && ashconData.uuid) {
-            return ashconData.uuid.replace(/-/g, ''); // Clean 32-char UUID
-          }
-        }
-      } catch (e) {}
-
-      // 2. Fallback: Try xuid.io through CORS Proxy for Bedrock XUIDs
-      try {
-        const bedrockUrl = encodeURIComponent(`https://xuid.io/api/v1/xuid/${username}`);
-        const bedrockRes = await fetch(`https://corsproxy.io/?${bedrockUrl}`);
-        if (bedrockRes.ok) {
-          const bedrockData = await bedrockRes.json();
-          if (bedrockData && bedrockData.xuid) {
-            return bedrockData.xuid;
-          }
-        }
-      } catch (e) {}
-
-      // 3. Fallback to raw username if lookups fail
-      return username;
-    }
-
     async function savePlayerToFirebase() {
       const name = document.getElementById('player-name').value.trim();
+      const platform = document.getElementById('player-platform').value;
       const region = document.getElementById('player-region').value;
 
       if (!name) { alert('Please enter a player username!'); return; }
 
       const btn = document.getElementById('save-btn');
-      btn.textContent = '⏳ Resolving ID & Syncing...';
+      btn.textContent = '⏳ Syncing...';
       btn.disabled = true;
-
-      const uniqueId = await resolvePlayerIdentifier(name);
 
       const playerObj = {
         name: name,
-        id: uniqueId,
+        platform: platform,
         region: region,
         retired: false,
         tiers: {
@@ -201,7 +178,7 @@
         });
 
         if (res.ok) {
-          alert(`SUCCESS! "${name}" saved with ID (${uniqueId})!`);
+          alert(`SUCCESS! "${name}" saved to database!`);
         } else {
           alert('Firebase Error saving player.');
         }
@@ -218,10 +195,9 @@
       if (!name) { alert('Please enter a player username to retire!'); return; }
       if (!confirm(`Mark "${name}" as RETIRED?`)) return;
 
-      const uniqueId = await resolvePlayerIdentifier(name);
       const playerObj = {
         name: name,
-        id: uniqueId,
+        platform: document.getElementById('player-platform').value,
         region: document.getElementById('player-region').value,
         retired: true,
         tiers: {
