@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controller PvP | Dashboard</title>
+  <title>Controller PvP | Leaderboards & Tierlist</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -32,12 +32,6 @@
       box-shadow: 1px 1px 0px #000;
     }
     /* Tier Accent Colors */
-    .tier-S { color: #FFD700; border-color: #FFD700; }
-    .tier-A { color: #38BDF8; border-color: #38BDF8; }
-    .tier-B { color: #C0C0C0; border-color: #C0C0C0; }
-    .tier-C { color: #CD7F32; border-color: #CD7F32; }
-    .tier-D { color: #6B7280; border-color: #6B7280; }
-    
     .bg-tier-S { background-color: #FFD700; color: #000; }
     .bg-tier-A { background-color: #38BDF8; color: #000; }
     .bg-tier-B { background-color: #C0C0C0; color: #000; }
@@ -65,18 +59,51 @@
     </nav>
   </header>
 
+  <!-- PLAYER SEARCH BAR -->
+  <section class="brutalist-card p-3 mb-6 relative">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-magnifying-glass text-slate-400 pl-2"></i>
+      <input type="text" id="player-search-input" onkeyup="searchPlayer()" placeholder="Search player to view all tiers..." class="bg-transparent text-xs sm:text-sm font-bold uppercase tracking-wider text-white w-full focus:outline-none p-1">
+    </div>
+
+    <!-- SEARCH RESULTS DROPDOWN / OVERLAY -->
+    <div id="search-modal" class="hidden absolute top-14 left-0 right-0 z-50 brutalist-card p-4 bg-slate-950/95 backdrop-blur border-amber-400">
+      <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+        <h3 id="search-card-title" class="font-black text-amber-400 uppercase text-sm">Player Profile</h3>
+        <button onclick="closeSearchModal()" class="text-xs font-bold text-slate-400 hover:text-white uppercase"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+      <div id="search-card-body" class="space-y-3">
+        <!-- Dynamic Player Profile -->
+      </div>
+    </div>
+  </section>
+
   <!-- HOME VIEW -->
   <main id="view-home" class="space-y-6">
-    <!-- TOP PODIUM SECTION -->
+
+    <!-- PODIUM SUB-TAB SELECTOR -->
+    <div class="flex justify-center gap-2">
+      <button onclick="switchPodiumTab('combined')" id="podium-tab-combined" class="brutalist-btn px-4 py-1.5 text-xs font-black uppercase tracking-wider bg-amber-500 text-black">
+        👑 Overall Combined
+      </button>
+      <button onclick="switchPodiumTab('java')" id="podium-tab-java" class="brutalist-btn px-4 py-1.5 text-xs font-black uppercase tracking-wider text-sky-400">
+        ☕ Java Overall
+      </button>
+      <button onclick="switchPodiumTab('bedrock')" id="podium-tab-bedrock" class="brutalist-btn px-4 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-400">
+        🧱 Bedrock Overall
+      </button>
+    </div>
+
+    <!-- DYNAMIC PODIUM CONTAINER -->
     <section class="brutalist-card p-4 sm:p-6 text-center">
-      <h2 class="text-xs font-black text-amber-400 tracking-widest uppercase mb-1">Supported by Controller Creators</h2>
-      <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">👑 Top Players Podium 👑</h3>
+      <h2 id="podium-sub-heading" class="text-xs font-black text-amber-400 tracking-widest uppercase mb-1">Combined Cross-Platform Ranks</h2>
+      <h3 id="podium-main-heading" class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">👑 Overall Leaderboard Podium 👑</h3>
 
       <div class="flex justify-center items-end gap-2 sm:gap-6 min-h-[220px]">
         <!-- #2 Rank -->
         <div class="flex flex-col items-center w-24 sm:w-32">
           <div class="h-28 sm:h-36 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-2-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="2nd Place" onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
+            <img id="podium-2-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="2nd Place">
           </div>
           <div class="w-full bg-slate-300 text-slate-900 font-black py-2 border-2 border-slate-400 shadow-[2px_2px_0px_#000]">2</div>
           <span id="podium-2-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full">---</span>
@@ -87,7 +114,7 @@
         <div class="flex flex-col items-center w-28 sm:w-36 -mt-6">
           <i class="fa-solid fa-crown text-amber-400 text-xl mb-1 animate-bounce"></i>
           <div class="h-32 sm:h-40 w-28 sm:w-36 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-1-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]" alt="1st Place" onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
+            <img id="podium-1-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]" alt="1st Place">
           </div>
           <div class="w-full bg-amber-400 text-black font-black py-3 border-2 border-amber-300 shadow-[3px_3px_0px_#000] text-lg">1</div>
           <span id="podium-1-name" class="font-bold text-sm sm:text-base mt-2 truncate w-full text-amber-400">---</span>
@@ -97,7 +124,7 @@
         <!-- #3 Rank -->
         <div class="flex flex-col items-center w-24 sm:w-32">
           <div class="h-24 sm:h-32 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-3-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="3rd Place" onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
+            <img id="podium-3-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="3rd Place">
           </div>
           <div class="w-full bg-amber-700 text-amber-100 font-black py-1.5 border-2 border-amber-600 shadow-[2px_2px_0px_#000]">3</div>
           <span id="podium-3-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full">---</span>
@@ -212,6 +239,15 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <label class="text-xs font-bold uppercase text-slate-400">Platform Filter:</label>
+        <select id="platform-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase">
+          <option value="ALL">All Platforms</option>
+          <option value="JAVA">Java Only</option>
+          <option value="BEDROCK">Bedrock Only</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2">
         <label class="text-xs font-bold uppercase text-slate-400">Region:</label>
         <select id="region-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase">
           <option value="ALL">Global (All)</option>
@@ -234,6 +270,7 @@
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
 
     let appData = { players: [] };
+    let currentPodiumMode = 'combined'; // 'combined', 'java', 'bedrock'
 
     async function loadData() {
       try {
@@ -264,6 +301,35 @@
       if (tab === 'tierlist') renderTierlist();
     }
 
+    function switchPodiumTab(mode) {
+      currentPodiumMode = mode;
+      ['combined', 'java', 'bedrock'].forEach(m => {
+        const btn = document.getElementById(`podium-tab-${m}`);
+        btn.classList.remove('bg-amber-500', 'text-black', 'bg-sky-500', 'bg-emerald-500');
+      });
+
+      const activeBtn = document.getElementById(`podium-tab-${mode}`);
+      if (mode === 'combined') activeBtn.classList.add('bg-amber-500', 'text-black');
+      if (mode === 'java') activeBtn.classList.add('bg-sky-500', 'text-black');
+      if (mode === 'bedrock') activeBtn.classList.add('bg-emerald-500', 'text-black');
+
+      const subHeading = document.getElementById('podium-sub-heading');
+      const mainHeading = document.getElementById('podium-main-heading');
+
+      if (mode === 'combined') {
+        subHeading.textContent = 'Combined Cross-Platform Ranks';
+        mainHeading.textContent = '👑 Overall Leaderboard Podium 👑';
+      } else if (mode === 'java') {
+        subHeading.textContent = 'Java Edition Competitive Ranks';
+        mainHeading.textContent = '☕ Java Overall Podium ☕';
+      } else if (mode === 'bedrock') {
+        subHeading.textContent = 'Bedrock Edition Competitive Ranks';
+        mainHeading.textContent = '🧱 Bedrock Overall Podium 🧱';
+      }
+
+      renderPodium();
+    }
+
     function getRenderUrl(player) {
       if (!player || !player.name) {
         return 'https://api.mcheads.org/avatar/2fach/right/192';
@@ -275,7 +341,7 @@
       return `https://api.mcheads.org/avatar/${player.name}/right/192`;
     }
 
-    function calculatePoints(player) {
+    function calculatePoints(player, modeFilter = 'combined') {
       if (!player || !player.tiers || player.retired) return 0;
       const pointsMap = { 
         'HIGH S': 100, 'LOW S': 90, 
@@ -284,16 +350,32 @@
         'HIGH C': 40, 'LOW C': 30, 
         'HIGH D': 20, 'LOW D': 10 
       };
-      return Object.values(player.tiers).reduce((sum, tier) => {
-        if (!tier) return sum;
-        const key = String(tier).toUpperCase().trim();
+
+      const javaModes = ['sword', 'smp', 'crystal', 'mace', 'uhc', 'pot'];
+      const bedrockModes = ['skywars', 'nodebuff', 'midfights', 'bridging'];
+
+      return Object.entries(player.tiers).reduce((sum, [gameMode, tierVal]) => {
+        if (!tierVal) return sum;
+        const key = String(tierVal).toUpperCase().trim();
+        const lowerMode = gameMode.toLowerCase();
+
+        if (modeFilter === 'java' && !javaModes.includes(lowerMode)) return sum;
+        if (modeFilter === 'bedrock' && !bedrockModes.includes(lowerMode)) return sum;
+
         return sum + (pointsMap[key] || 0);
       }, 0);
     }
 
     function renderPodium() {
-      const activePlayers = (appData.players || []).filter(p => !p.retired);
-      const sortedPlayers = activePlayers.sort((a, b) => calculatePoints(b) - calculatePoints(a));
+      const activePlayers = (appData.players || []).filter(p => {
+        if (p.retired) return false;
+        const pPlatform = String(p.platform || 'java').toLowerCase();
+        if (currentPodiumMode === 'java' && pPlatform !== 'java') return false;
+        if (currentPodiumMode === 'bedrock' && pPlatform !== 'bedrock') return false;
+        return calculatePoints(p, currentPodiumMode) > 0;
+      });
+
+      const sortedPlayers = activePlayers.sort((a, b) => calculatePoints(b, currentPodiumMode) - calculatePoints(a, currentPodiumMode));
       const top3 = sortedPlayers.slice(0, 3);
 
       [1, 2, 3].forEach((rank, index) => {
@@ -306,7 +388,7 @@
           imgEl.src = getRenderUrl(player);
           imgEl.onerror = () => { imgEl.src = 'https://api.mcheads.org/avatar/2fach/right/192'; };
           nameEl.textContent = player.name;
-          ptsEl.textContent = `${calculatePoints(player)} PTS`;
+          ptsEl.textContent = `${calculatePoints(player, currentPodiumMode)} PTS`;
         } else {
           imgEl.src = 'https://api.mcheads.org/avatar/2fach/right/192';
           nameEl.textContent = '---';
@@ -317,6 +399,7 @@
 
     function renderTierlist() {
       const selectedMode = document.getElementById('mode-select').value.toLowerCase().trim();
+      const selectedPlatform = document.getElementById('platform-select').value.toUpperCase().trim();
       const selectedRegion = document.getElementById('region-select').value.toUpperCase().trim();
       const container = document.getElementById('tiers-container');
       container.innerHTML = '';
@@ -341,21 +424,24 @@
             const playerTierVal = modeKey ? String(p.tiers[modeKey]).trim().toLowerCase() : '';
             const matchesMode = playerTierVal === sub.toLowerCase();
             
+            const playerPlatform = String(p.platform || 'java').toUpperCase();
+            const matchesPlatform = selectedPlatform === 'ALL' || playerPlatform === selectedPlatform;
+
             const playerRegion = String(p.region || 'NA').trim().toUpperCase();
             const matchesRegion = selectedRegion === 'ALL' || playerRegion === selectedRegion;
             
-            return matchesMode && matchesRegion;
+            return matchesMode && matchesPlatform && matchesRegion;
           });
 
           let playerCards = matchingPlayers.map(p => {
             return `
-              <div class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44">
+              <div onclick="selectPlayerFromSearch('${p.name}')" class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44 cursor-pointer hover:border-amber-400">
                 <div class="h-10 w-10 overflow-hidden relative shrink-0 border border-slate-700 bg-slate-950 flex justify-center">
                   <img src="${getRenderUrl(p)}" class="w-full h-full object-contain" onerror="this.src='https://api.mcheads.org/avatar/2fach/right/192'">
                 </div>
                 <div class="overflow-hidden">
                   <div class="font-bold text-xs truncate">${p.name}</div>
-                  <div class="text-[10px] text-slate-400 font-mono">${p.region || 'NA'}</div>
+                  <div class="text-[10px] text-slate-400 font-mono">${p.platform ? p.platform.toUpperCase() : 'JAVA'} • ${p.region || 'NA'}</div>
                 </div>
               </div>
             `;
@@ -382,6 +468,65 @@
           </div>
         `;
       });
+    }
+
+    /* SEARCH FUNCTIONALITY */
+    function searchPlayer() {
+      const query = document.getElementById('player-search-input').value.trim().toLowerCase();
+      const modal = document.getElementById('search-modal');
+      const body = document.getElementById('search-card-body');
+
+      if (!query) {
+        modal.classList.add('hidden');
+        return;
+      }
+
+      const matches = (appData.players || []).filter(p => p.name.toLowerCase().includes(query));
+
+      if (matches.length === 0) {
+        body.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No player found matching "${query}"</p>`;
+        modal.classList.remove('hidden');
+        return;
+      }
+
+      body.innerHTML = matches.map(p => {
+        let tierBadges = '';
+        if (p.tiers) {
+          Object.entries(p.tiers).forEach(([mode, tier]) => {
+            if (tier) {
+              tierBadges += `<span class="bg-slate-900 border border-slate-700 px-2 py-1 rounded text-[10px] font-bold"><strong class="text-amber-400 uppercase">${mode}:</strong> ${tier}</span> `;
+            }
+          });
+        }
+        if (!tierBadges) tierBadges = '<span class="text-xs text-slate-500 italic">No assigned tiers</span>';
+
+        return `
+          <div class="brutalist-card p-3 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div class="flex items-center gap-3">
+              <img src="${getRenderUrl(p)}" class="h-12 w-12 object-contain border border-slate-700 bg-slate-900 p-1">
+              <div>
+                <h4 class="font-black text-sm text-white">${p.name} ${p.retired ? '<span class="text-[10px] text-amber-500 font-normal">(RETIRED)</span>' : ''}</h4>
+                <p class="text-[10px] text-slate-400 font-mono">${(p.platform || 'java').toUpperCase()} • Region: ${p.region || 'NA'} • Total: ${calculatePoints(p)} PTS</p>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-1 max-w-md">
+              ${tierBadges}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      modal.classList.remove('hidden');
+    }
+
+    function selectPlayerFromSearch(name) {
+      document.getElementById('player-search-input').value = name;
+      searchPlayer();
+    }
+
+    function closeSearchModal() {
+      document.getElementById('search-modal').classList.add('hidden');
+      document.getElementById('player-search-input').value = '';
     }
 
     loadData();
