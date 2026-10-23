@@ -47,11 +47,6 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
 
-  <!-- DEBUG WARNING BANNER -->
-  <div id="debug-banner" class="hidden brutalist-card p-3 mb-4 bg-amber-900/40 border-amber-500 text-amber-200 text-xs font-mono flex items-center justify-between">
-    <span>⚠️ <strong class="uppercase">Notice:</strong> <span id="debug-text">No roster data loaded. Ensure a player is saved in admin.html.</span></span>
-  </div>
-
   <!-- TOP HEADER -->
   <header class="brutalist-card p-3 mb-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
@@ -236,58 +231,55 @@
     let appData = { players: [] };
 
     async function loadData() {
-      let loaded = false;
+      let loadedData = false;
 
-      // Attempt 1: Raw GitHub Fetch from main
+      // 1. Fetch latest file commit hash to bypass GitHub's CDN cache completely
       try {
-        const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/roster.json?t=${new Date().getTime()}`);
-        if (res.ok) {
-          const players = await res.json();
-          if (Array.isArray(players) && players.length > 0) {
-            appData.players = players;
-            loaded = true;
+        const commitRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/commits?path=roster.json&page=1&per_page=1`);
+        if (commitRes.ok) {
+          const commits = await commitRes.json();
+          if (commits.length > 0) {
+            const sha = commits[0].sha;
+            // Fetch exact raw file version by SHA
+            const rawRes = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${sha}/roster.json`);
+            if (rawRes.ok) {
+              const players = await rawRes.json();
+              if (Array.isArray(players)) {
+                appData.players = players;
+                loadedData = true;
+              }
+            }
           }
         }
       } catch (e) {
-        console.warn('Main branch fetch failed:', e);
+        console.warn('Commit hash bypass failed, attempting standard fallback:', e);
       }
 
-      // Attempt 2: Fallback to master branch if main was empty
-      if (!loaded) {
+      // 2. Standard raw URL fallback with timestamp cache buster
+      if (!loadedData) {
         try {
-          const resMaster = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/master/roster.json?t=${new Date().getTime()}`);
-          if (resMaster.ok) {
-            const players = await resMaster.json();
-            if (Array.isArray(players) && players.length > 0) {
+          const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/roster.json?nocache=${Date.now()}`);
+          if (res.ok) {
+            const players = await res.json();
+            if (Array.isArray(players)) {
               appData.players = players;
-              loaded = true;
+              loadedData = true;
             }
           }
-        } catch (e) {
-          console.warn('Master branch fetch failed:', e);
-        }
+        } catch (e) {}
       }
 
-      // Attempt 3: Fallback to local storage
-      if (!loaded) {
+      // 3. Fallback to Local Storage backup
+      if (!loadedData) {
         const localStored = localStorage.getItem('controller_pvp_data');
         if (localStored) {
           try {
             const parsed = JSON.parse(localStored);
-            if (parsed.players && parsed.players.length > 0) {
+            if (parsed.players && Array.isArray(parsed.players)) {
               appData.players = parsed.players;
-              loaded = true;
             }
           } catch (err) {}
         }
-      }
-
-      // Show/Hide Debug Banner
-      const banner = document.getElementById('debug-banner');
-      if (!loaded || !appData.players || appData.players.length === 0) {
-        banner.classList.remove('hidden');
-      } else {
-        banner.classList.add('hidden');
       }
 
       renderPodium();
@@ -367,7 +359,6 @@
           const matchingPlayers = (appData.players || []).filter(p => {
             if (!p.tiers) return false;
             
-            // Case-insensitive key and value matching
             const modeKey = Object.keys(p.tiers).find(k => k.toLowerCase().trim() === selectedMode);
             const playerTierVal = modeKey ? String(p.tiers[modeKey]).trim().toLowerCase() : '';
             const matchesMode = playerTierVal === sub.toLowerCase();
