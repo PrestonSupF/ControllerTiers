@@ -1,4 +1,13 @@
 module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -16,7 +25,7 @@ module.exports = async (req, res) => {
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
     if (!GITHUB_TOKEN) {
-      return res.status(500).json({ error: 'Server GitHub token is not configured in Vercel.' });
+      return res.status(500).json({ error: 'GitHub Error: Server GitHub token is not configured in Vercel.' });
     }
 
     const headers = {
@@ -37,7 +46,7 @@ module.exports = async (req, res) => {
       fileSha = checkData.sha;
     }
 
-    await fetch(fileUrl, {
+    const playerCommit = await fetch(fileUrl, {
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -47,7 +56,12 @@ module.exports = async (req, res) => {
       })
     });
 
-    // 2. Update a master roster.json file for public viewing
+    if (!playerCommit.ok) {
+      const errJson = await playerCommit.json();
+      throw new Error(`GitHub Player Commit Failed: ${errJson.message || playerCommit.statusText}`);
+    }
+
+    // 2. Update master roster.json file
     const rosterPath = 'roster.json';
     const rosterUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${rosterPath}`;
     
@@ -58,8 +72,12 @@ module.exports = async (req, res) => {
     if (rosterCheck.ok) {
       const rosterData = await rosterCheck.json();
       rosterSha = rosterData.sha;
-      const decoded = JSON.parse(Buffer.from(rosterData.content, 'base64').toString('utf8'));
-      if (Array.isArray(decoded)) playersList = decoded;
+      try {
+        const decoded = JSON.parse(Buffer.from(rosterData.content, 'base64').toString('utf8'));
+        if (Array.isArray(decoded)) playersList = decoded;
+      } catch (e) {
+        playersList = [];
+      }
     }
 
     const index = playersList.findIndex(p => p.name.toLowerCase() === player.name.toLowerCase());
@@ -69,7 +87,7 @@ module.exports = async (req, res) => {
       playersList.push(player);
     }
 
-    await fetch(rosterUrl, {
+    const rosterCommit = await fetch(rosterUrl, {
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -78,6 +96,11 @@ module.exports = async (req, res) => {
         ...(rosterSha && { sha: rosterSha })
       })
     });
+
+    if (!rosterCommit.ok) {
+      const errJson = await rosterCommit.json();
+      throw new Error(`GitHub Roster Commit Failed: ${errJson.message || rosterCommit.statusText}`);
+    }
 
     return res.status(200).json({ success: true });
   } catch (err) {
