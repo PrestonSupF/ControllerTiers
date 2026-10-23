@@ -5,256 +5,237 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controller PvP | Admin Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      background-color: #090b0e;
-      color: #e2e8f0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .brutalist-card {
-      background: #11161d;
-      border: 2px solid #1e293b;
-      box-shadow: 4px 4px 0px #000;
-    }
-    .brutalist-btn {
-      background: #1e293b;
-      border: 2px solid #334155;
-      box-shadow: 3px 3px 0px #000;
-      transition: all 0.1s ease;
-    }
-    .brutalist-btn:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0px #000;
-    }
+    body { background-color: #090b0e; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .brutalist-card { background: #11161d; border: 2px solid #1e293b; box-shadow: 4px 4px 0px #000; }
+    .brutalist-btn { background: #1e293b; border: 2px solid #334155; box-shadow: 3px 3px 0px #000; transition: all 0.1s ease; }
+    .brutalist-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0px #000; }
+    .brutalist-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
   </style>
 </head>
-<body class="min-h-screen p-4 max-w-4xl mx-auto flex flex-col justify-center">
+<body class="min-h-screen p-4 max-w-4xl mx-auto flex flex-col gap-6">
 
-  <!-- AUTHENTICATION MODAL -->
-  <div id="auth-container" class="brutalist-card p-6 max-w-md mx-auto w-full text-center">
-    <i class="fa-solid fa-lock text-3xl text-amber-400 mb-3"></i>
-    <h2 class="text-xl font-black uppercase mb-4 tracking-wider">Admin Authentication</h2>
-    <form onsubmit="authenticate(event)" class="space-y-4">
-      <input type="password" id="passcode-input" placeholder="Enter Admin Passcode" 
-             class="w-full bg-slate-900 border border-slate-700 p-3 text-center text-sm font-bold tracking-widest text-white focus:outline-none focus:border-amber-400">
-      <button type="submit" class="brutalist-btn w-full py-3 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-wider text-xs">
-        Unlock Panel
-      </button>
-      <p id="auth-error" class="text-xs text-red-500 hidden font-bold">Incorrect passcode. Access denied.</p>
-    </form>
-  </div>
+  <!-- HEADER -->
+  <header class="brutalist-card p-4 flex justify-between items-center">
+    <h1 class="text-xl font-black uppercase text-amber-400">🔧 Controller PvP Admin Panel</h1>
+    <a href="index.html" class="brutalist-btn text-xs font-bold px-3 py-1.5 uppercase">View Site</a>
+  </header>
 
-  <!-- ADMIN DASHBOARD -->
-  <div id="admin-panel" class="hidden space-y-6">
-    <header class="brutalist-card p-4 flex items-center justify-between border-amber-500/40">
-      <div class="flex items-center gap-3">
-        <i class="fa-solid fa-wrench text-amber-400 text-xl"></i>
-        <h1 class="text-lg font-black uppercase tracking-wider">Controller PvP Admin Panel</h1>
-      </div>
-      <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase text-slate-300">View Site</a>
-    </header>
-
-    <!-- PLAYER MANAGEMENT SECTION -->
-    <section class="brutalist-card p-5 space-y-4">
-      <h2 class="text-sm font-black uppercase tracking-wider text-amber-400 border-b border-slate-800 pb-2">
-        <i class="fa-solid fa-user-gear"></i> Player Management
-      </h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Player Username</label>
-          <input type="text" id="player-name" placeholder="e.g. Tynza" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs font-bold">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Region</label>
-          <select id="player-region" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs font-bold">
-            <option value="NA">NA - North America</option>
-            <option value="EU">EU - Europe</option>
-            <option value="AS">AS - Asia</option>
-            <option value="SA">SA - South America</option>
-            <option value="OCE">OCE - Oceania</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Gamemode</label>
-          <select id="player-mode" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase">
-            <optgroup label="Java">
-              <option value="sword">Sword</option>
-              <option value="smp">SMP</option>
-              <option value="crystal">Crystal</option>
-              <option value="mace">Mace</option>
-              <option value="uhc">UHC</option>
-              <option value="pot">Pot</option>
-            </optgroup>
-            <optgroup label="Bedrock">
-              <option value="skywars">Skywars</option>
-              <option value="nodebuff">Nodebuff</option>
-              <option value="midfights">Midfights</option>
-              <option value="bridging">Bridging</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Assigned Tier</label>
-          <select id="player-tier" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs font-bold">
-            <option value="High S">High S</option>
-            <option value="Low S">Low S</option>
-            <option value="High A">High A</option>
-            <option value="Low A">Low A</option>
-            <option value="High B">High B</option>
-            <option value="Low B">Low B</option>
-            <option value="High C">High C</option>
-            <option value="Low C">Low C</option>
-            <option value="High D">High D</option>
-            <option value="Low D">Low D</option>
-            <option value="NONE">Remove Tier Rank</option>
-          </select>
-        </div>
-      </div>
-
-      <button onclick="savePlayer()" class="brutalist-btn w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
-        Save Player Tier & Commit to GitHub
-      </button>
-    </section>
-
-    <!-- ROSTER LIST -->
-    <section class="brutalist-card p-5 space-y-4">
-      <h2 class="text-sm font-black uppercase tracking-wider text-amber-400 border-b border-slate-800 pb-2">
-        <i class="fa-solid fa-users"></i> Registered Roster
-      </h2>
-      <div id="roster-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
-        <!-- Dynamic Roster -->
-      </div>
-    </section>
-
-    <div class="flex justify-between items-center text-xs">
-      <button onclick="resetData()" class="text-red-400 hover:underline"><i class="fa-solid fa-trash"></i> Reset Local Data</button>
-      <span id="save-status" class="text-emerald-400 font-bold hidden">Changes Saved to GitHub!</span>
+  <!-- GITHUB TOKEN SETUP -->
+  <section class="brutalist-card p-5 space-y-3">
+    <h2 class="text-sm font-black uppercase text-slate-400">1. Authentication Settings</h2>
+    <div class="flex flex-col gap-2">
+      <label class="text-xs font-bold text-slate-300">GitHub Personal Access Token (PAT):</label>
+      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="bg-slate-900 border border-slate-700 p-2 text-xs font-mono rounded text-amber-300 w-full">
+      <p class="text-[10px] text-slate-500">Token is stored locally in your browser and used only to push commits to GitHub.</p>
     </div>
-  </div>
+  </section>
+
+  <!-- PLAYER MANAGEMENT -->
+  <section class="brutalist-card p-5 space-y-4">
+    <h2 class="text-sm font-black uppercase text-slate-400">2. Player Management</h2>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="text-xs font-bold text-slate-300">Player Username</label>
+        <input type="text" id="player-name" placeholder="e.g. Tynza" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-300">Region</label>
+        <select id="player-region" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
+          <option value="NA">NA (North America)</option>
+          <option value="EU">EU (Europe)</option>
+          <option value="AS">AS (Asia)</option>
+          <option value="SA">SA (South America)</option>
+          <option value="OCE">OCE (Oceania)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TIER ASSIGNMENTS -->
+    <div class="space-y-3">
+      <h3 class="text-xs font-black uppercase text-slate-400">Assign Gamemode Tiers</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">Sword</label>
+          <select id="tier-sword" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
+            <option value="">None</option>
+            <option value="High S">High S</option><option value="Low S">Low S</option>
+            <option value="High A">High A</option><option value="Low A">Low A</option>
+            <option value="High B">High B</option><option value="Low B">Low B</option>
+            <option value="High C">High C</option><option value="Low C">Low C</option>
+            <option value="High D">High D</option><option value="Low D">Low D</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">SMP</label>
+          <select id="tier-smp" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
+            <option value="">None</option>
+            <option value="High S">High S</option><option value="Low S">Low S</option>
+            <option value="High A">High A</option><option value="Low A">Low A</option>
+            <option value="High B">High B</option><option value="Low B">Low B</option>
+            <option value="High C">High C</option><option value="Low C">Low C</option>
+            <option value="High D">High D</option><option value="Low D">Low D</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">Crystal</label>
+          <select id="tier-crystal" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
+            <option value="">None</option>
+            <option value="High S">High S</option><option value="Low S">Low S</option>
+            <option value="High A">High A</option><option value="Low A">Low A</option>
+            <option value="High B">High B</option><option value="Low B">Low B</option>
+            <option value="High C">High C</option><option value="Low C">Low C</option>
+            <option value="High D">High D</option><option value="Low D">Low D</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">Mace</label>
+          <select id="tier-mace" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
+            <option value="">None</option>
+            <option value="High S">High S</option><option value="Low S">Low S</option>
+            <option value="High A">High A</option><option value="Low A">Low A</option>
+            <option value="High B">High B</option><option value="Low B">Low B</option>
+            <option value="High C">High C</option><option value="Low C">Low C</option>
+            <option value="High D">High D</option><option value="Low D">Low D</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">UHC</label>
+          <select id="tier-uhc" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
+            <option value="">None</option>
+            <option value="High S">High S</option><option value="Low S">Low S</option>
+            <option value="High A">High A</option><option value="Low A">Low A</option>
+            <option value="High B">High B</option><option value="Low B">Low B</option>
+            <option value="High C">High C</option><option value="Low C">Low C</option>
+            <option value="High D">High D</option><option value="Low D">Low D</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">Pot</label>
+          <select id="tier-pot" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
+            <option value="">None</option>
+            <option value="High S">High S</option><option value="Low S">Low S</option>
+            <option value="High A">High A</option><option value="Low A">Low A</option>
+            <option value="High B">High B</option><option value="Low B">Low B</option>
+            <option value="High C">High C</option><option value="Low C">Low C</option>
+            <option value="High D">High D</option><option value="Low D">Low D</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="savePlayerToGitHub()" id="save-btn" class="brutalist-btn w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-xs tracking-wider">
+      💾 Save Player Tier & Commit to GitHub
+    </button>
+  </section>
 
   <script>
-    const PASSCODE = 'control';
+    const GITHUB_OWNER = "PrestonSupF";
+    const GITHUB_REPO = "ControllerTiers";
 
-    function authenticate(e) {
-      e.preventDefault();
-      const input = document.getElementById('passcode-input').value;
-      if (input === PASSCODE) {
-        document.getElementById('auth-container').classList.add('hidden');
-        document.getElementById('admin-panel').classList.remove('hidden');
-        renderRoster();
-      } else {
-        document.getElementById('auth-error').classList.remove('hidden');
-      }
-    }
+    // Load saved GitHub token locally
+    document.getElementById('gh-token').value = localStorage.getItem('gh_admin_token') || '';
+    document.getElementById('gh-token').addEventListener('input', (e) => {
+      localStorage.setItem('gh_admin_token', e.target.value.trim());
+    });
 
-    function getData() {
-      const stored = localStorage.getItem('controller_pvp_data');
-      return stored ? JSON.parse(stored) : { players: [] };
-    }
-
-    async function savePlayer() {
+    async function savePlayerToGitHub() {
+      const token = document.getElementById('gh-token').value.trim();
       const name = document.getElementById('player-name').value.trim();
       const region = document.getElementById('player-region').value;
-      const mode = document.getElementById('player-mode').value;
-      const tier = document.getElementById('player-tier').value;
 
-      if (!name) return alert('Please enter a username.');
-
-      let data = getData();
-      let player = data.players.find(p => p.name.toLowerCase() === name.toLowerCase());
-
-      if (!player) {
-        player = { name: name, region: region, tiers: {} };
-        data.players.push(player);
-      } else {
-        player.region = region;
+      if (!token) {
+        alert('Please enter your GitHub Personal Access Token first!');
+        return;
       }
-
-      if (tier === "NONE") {
-        delete player.tiers[mode];
-      } else {
-        player.tiers[mode] = tier;
-      }
-
-      localStorage.setItem('controller_pvp_data', JSON.stringify(data));
-      renderRoster();
-
-      await savePlayerToGitHub(player);
-
-      document.getElementById('player-name').value = '';
-    }
-
-    async function savePlayerToGitHub(player) {
-      try {
-        const res = await fetch('/api/save-tier', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ player })
-        });
-
-        const result = await res.json();
-        if (res.ok) {
-          showStatus();
-        } else {
-          alert(`GitHub Error: ${result.error || 'Unknown error'}`);
-        }
-      } catch (err) {
-        console.error('Failed to save to GitHub:', err);
-        alert('Failed to connect to backend server.');
-      }
-    }
-
-    function renderRoster() {
-      const data = getData();
-      const listEl = document.getElementById('roster-list');
-      listEl.innerHTML = '';
-
-      if (data.players.length === 0) {
-        listEl.innerHTML = `<span class="text-xs text-slate-500 italic">No players added yet.</span>`;
+      if (!name) {
+        alert('Please enter a player username!');
         return;
       }
 
-      data.players.forEach(p => {
-        listEl.innerHTML += `
-          <div class="brutalist-card p-2 flex items-center justify-between text-xs bg-slate-900">
-            <div class="flex items-center gap-2">
-              <img src="https://render.crafty.gg/3d/bust/${p.name}" class="h-6 w-6 object-contain" onerror="this.src='https://render.crafty.gg/3d/bust/2fach'">
-              <span class="font-bold">${p.name}</span>
-              <span class="text-[10px] text-slate-500 font-mono">(${p.region || 'NA'})</span>
-            </div>
-            <button onclick="deletePlayer('${p.name}')" class="text-red-400 hover:text-red-300 p-1">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-        `;
-      });
-    }
+      const btn = document.getElementById('save-btn');
+      btn.textContent = '⏳ Committing to GitHub...';
+      btn.disabled = true;
 
-    function deletePlayer(name) {
-      if (!confirm(`Are you sure you want to remove ${name}?`)) return;
-      let data = getData();
-      data.players = data.players.filter(p => p.name !== name);
-      localStorage.setItem('controller_pvp_data', JSON.stringify(data));
-      renderRoster();
-    }
+      const playerObj = {
+        name: name,
+        region: region,
+        tiers: {
+          sword: document.getElementById('tier-sword').value,
+          smp: document.getElementById('tier-smp').value,
+          crystal: document.getElementById('tier-crystal').value,
+          mace: document.getElementById('tier-mace').value,
+          uhc: document.getElementById('tier-uhc').value,
+          pot: document.getElementById('tier-pot').value
+        }
+      };
 
-    function resetData() {
-      if (confirm('Reset local player ranks?')) {
-        localStorage.removeItem('controller_pvp_data');
-        renderRoster();
+      const headers = {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      };
+
+      try {
+        // Fetch current roster.json from GitHub
+        const rosterUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/roster.json`;
+        let rosterSha = null;
+        let playersList = [];
+
+        const rosterRes = await fetch(rosterUrl, { headers });
+        if (rosterRes.ok) {
+          const rosterData = await rosterRes.json();
+          rosterSha = rosterData.sha;
+          try {
+            // Decode base64 UTF-8
+            const binary = atob(rosterData.content.replace(/\s/g, ''));
+            const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+            const decodedStr = new TextDecoder().decode(bytes);
+            playersList = JSON.parse(decodedStr);
+          } catch(e) {
+            playersList = [];
+          }
+        }
+
+        // Update or append player in the list
+        const idx = playersList.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+        if (idx >= 0) {
+          playersList[idx] = playerObj;
+        } else {
+          playersList.push(playerObj);
+        }
+
+        // Encode roster to UTF-8 Base64
+        const jsonString = JSON.stringify(playersList, null, 2);
+        const utf8Bytes = new TextEncoder().encode(jsonString);
+        let base64Content = '';
+        utf8Bytes.forEach(b => base64Content += String.fromCharCode(b));
+        base64Content = btoa(base64Content);
+
+        // Commit directly to GitHub
+        const commitRes = await fetch(rosterUrl, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            message: `Update roster for ${name}`,
+            content: base64Content,
+            ...(rosterSha && { sha: rosterSha })
+          })
+        });
+
+        if (commitRes.ok) {
+          alert(`Success! Player "${name}" has been saved and committed directly to GitHub!`);
+        } else {
+          const errData = await commitRes.json();
+          alert(`GitHub Commit Error: ${errData.message || 'Check token permissions.'}`);
+        }
+      } catch (err) {
+        alert(`Exception: ${err.message}`);
+      } finally {
+        btn.textContent = '💾 Save Player Tier & Commit to GitHub';
+        btn.disabled = false;
       }
-    }
-
-    function showStatus() {
-      const status = document.getElementById('save-status');
-      status.classList.remove('hidden');
-      setTimeout(() => status.classList.add('hidden'), 2500);
     }
   </script>
 </body>
