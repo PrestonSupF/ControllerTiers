@@ -15,25 +15,14 @@
 </head>
 <body class="min-h-screen p-4 max-w-4xl mx-auto flex flex-col gap-6">
 
-  <!-- HEADER -->
   <header class="brutalist-card p-4 flex justify-between items-center">
     <h1 class="text-xl font-black uppercase text-amber-400">🔧 Controller PvP Admin Panel</h1>
     <a href="index.html" class="brutalist-btn text-xs font-bold px-3 py-1.5 uppercase">View Site</a>
   </header>
 
-  <!-- GITHUB TOKEN SETUP -->
-  <section class="brutalist-card p-5 space-y-3">
-    <h2 class="text-sm font-black uppercase text-slate-400">1. Authentication Settings</h2>
-    <div class="flex flex-col gap-2">
-      <label class="text-xs font-bold text-slate-300">GitHub Personal Access Token (PAT):</label>
-      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="bg-slate-900 border border-slate-700 p-2 text-xs font-mono rounded text-amber-300 w-full">
-      <p class="text-[10px] text-slate-500">Token is stored locally in your browser and used only to push commits to GitHub.</p>
-    </div>
-  </section>
-
   <!-- PLAYER MANAGEMENT -->
   <section class="brutalist-card p-5 space-y-4">
-    <h2 class="text-sm font-black uppercase text-slate-400">2. Player Management</h2>
+    <h2 class="text-sm font-black uppercase text-slate-400">Player Management</h2>
     
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
@@ -54,162 +43,48 @@
 
     <!-- TIER ASSIGNMENTS -->
     <div class="space-y-4">
-      <!-- JAVA GAMEMODES -->
       <div>
         <h3 class="text-xs font-black uppercase text-sky-400 mb-2 border-b border-slate-800 pb-1">☕ Java Gamemodes</h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Sword</label>
-            <select id="tier-sword" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">SMP</label>
-            <select id="tier-smp" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Crystal</label>
-            <select id="tier-crystal" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Mace</label>
-            <select id="tier-mace" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">UHC</label>
-            <select id="tier-uhc" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Pot</label>
-            <select id="tier-pot" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
+          <div><label class="font-bold text-slate-400 block mb-1">Sword</label><select id="tier-sword" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">SMP</label><select id="tier-smp" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">Crystal</label><select id="tier-crystal" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">Mace</label><select id="tier-mace" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">UHC</label><select id="tier-uhc" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">Pot</label><select id="tier-pot" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
         </div>
       </div>
 
-      <!-- BEDROCK GAMEMODES -->
       <div>
         <h3 class="text-xs font-black uppercase text-emerald-400 mb-2 border-b border-slate-800 pb-1">🧱 Bedrock Gamemodes</h3>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Skywars</label>
-            <select id="tier-skywars" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Nodebuff</label>
-            <select id="tier-nodebuff" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Midfights</label>
-            <select id="tier-midfights" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-slate-400 block mb-1">Bridging</label>
-            <select id="tier-bridging" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full">
-              <option value="">None</option>
-              <option value="High S">High S</option><option value="Low S">Low S</option>
-              <option value="High A">High A</option><option value="Low A">Low A</option>
-              <option value="High B">High B</option><option value="Low B">Low B</option>
-              <option value="High C">High C</option><option value="Low C">Low C</option>
-              <option value="High D">High D</option><option value="Low D">Low D</option>
-            </select>
-          </div>
+          <div><label class="font-bold text-slate-400 block mb-1">Skywars</label><select id="tier-skywars" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">Nodebuff</label><select id="tier-nodebuff" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">Midfights</label><select id="tier-midfights" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <div><label class="font-bold text-slate-400 block mb-1">Bridging</label><select id="tier-bridging" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
         </div>
       </div>
     </div>
 
-    <button onclick="savePlayerToGitHub()" id="save-btn" class="brutalist-btn w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-xs tracking-wider">
-      💾 Save Player Tier & Commit to GitHub
+    <button onclick="savePlayerToFirebase()" id="save-btn" class="brutalist-btn w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-xs tracking-wider">
+      💾 Save Player Tier & Sync Live
     </button>
   </section>
 
   <script>
-    const GITHUB_OWNER = "PrestonSupF";
-    const GITHUB_REPO = "ControllerTiers";
+    const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
 
-    // Load saved GitHub token locally
-    document.getElementById('gh-token').value = localStorage.getItem('gh_admin_token') || '';
-    document.getElementById('gh-token').addEventListener('input', (e) => {
-      localStorage.setItem('gh_admin_token', e.target.value.trim());
-    });
-
-    async function savePlayerToGitHub() {
-      const token = document.getElementById('gh-token').value.trim();
+    async function savePlayerToFirebase() {
       const name = document.getElementById('player-name').value.trim();
       const region = document.getElementById('player-region').value;
 
-      if (!token) {
-        alert('Please enter your GitHub Personal Access Token first!');
-        return;
-      }
       if (!name) {
         alert('Please enter a player username!');
         return;
       }
 
       const btn = document.getElementById('save-btn');
-      btn.textContent = '⏳ Committing to GitHub...';
+      btn.textContent = '⏳ Syncing to Firebase...';
       btn.disabled = true;
 
       const playerObj = {
@@ -229,74 +104,23 @@
         }
       };
 
-      const headers = {
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github.v3+json'
-      };
-
       try {
-        // Fetch current roster.json from GitHub
-        const rosterUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/roster.json`;
-        let rosterSha = null;
-        let playersList = [];
-
-        const rosterRes = await fetch(rosterUrl, { headers });
-        if (rosterRes.ok) {
-          const rosterData = await rosterRes.json();
-          rosterSha = rosterData.sha;
-          try {
-            const binary = atob(rosterData.content.replace(/\s/g, ''));
-            const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-            const decodedStr = new TextDecoder().decode(bytes);
-            playersList = JSON.parse(decodedStr);
-          } catch(e) {
-            playersList = [];
-          }
-        } else if (rosterRes.status === 404) {
-          // File does not exist on GitHub yet—initialize fresh roster
-          playersList = [];
-        } else {
-          const errData = await rosterRes.json();
-          throw new Error(`GitHub Roster Fetch Error: ${errData.message}`);
-        }
-
-        // Update or append player in the list
-        const idx = playersList.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-        if (idx >= 0) {
-          playersList[idx] = playerObj;
-        } else {
-          playersList.push(playerObj);
-        }
-
-        // Encode roster to UTF-8 Base64
-        const jsonString = JSON.stringify(playersList, null, 2);
-        const utf8Bytes = new TextEncoder().encode(jsonString);
-        let base64Content = '';
-        utf8Bytes.forEach(b => base64Content += String.fromCharCode(b));
-        base64Content = btoa(base64Content);
-
-        // Commit directly to GitHub root
-        const commitRes = await fetch(rosterUrl, {
+        const res = await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, {
           method: 'PUT',
-          headers,
-          body: JSON.stringify({
-            message: `Update roster for ${name}`,
-            content: base64Content,
-            ...(rosterSha && { sha: rosterSha })
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(playerObj)
         });
 
-        if (commitRes.ok) {
-          alert(`SUCCESS! Player "${name}" saved and committed to GitHub repository!\n\nAll external devices will see this update now.`);
+        if (res.ok) {
+          alert(`SUCCESS! "${name}" saved to Firebase database!\nChanges reflect instantly on all devices worldwide.`);
         } else {
-          const errData = await commitRes.json();
-          alert(`GitHub Commit Error: ${errData.message || 'Check token permissions.'}`);
+          const err = await res.json();
+          alert(`Firebase Error: ${err.error || 'Check database rules.'}`);
         }
       } catch (err) {
         alert(`Exception: ${err.message}`);
       } finally {
-        btn.textContent = '💾 Save Player Tier & Commit to GitHub';
+        btn.textContent = '💾 Save Player Tier & Sync Live';
         btn.disabled = false;
       }
     }
