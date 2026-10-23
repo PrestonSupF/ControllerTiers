@@ -90,7 +90,7 @@
         ☕ Java Overall
       </button>
       <button onclick="switchPodiumTab('bedrock')" id="podium-tab-bedrock" class="brutalist-btn px-4 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-400">
-        🧱 Bedrock Overall
+        MB Bedrock Overall
       </button>
     </div>
 
@@ -324,7 +324,7 @@
         mainHeading.textContent = '☕ Java Overall Podium ☕';
       } else if (mode === 'bedrock') {
         subHeading.textContent = 'Bedrock Edition Competitive Ranks';
-        mainHeading.textContent = '🧱 Bedrock Overall Podium 🧱';
+        mainHeading.textContent = 'MB Bedrock Overall Podium MB';
       }
 
       renderPodium();
@@ -335,7 +335,12 @@
         return 'https://api.mcheads.org/avatar/2fach/right/192';
       }
       const platform = String(player.platform || 'java').toLowerCase();
-      if (platform === 'bedrock') {
+      
+      // Auto-detect Bedrock if platform isn't explicitly set but player has Bedrock tiers
+      const hasBedrockTiers = player.tiers && (player.tiers.skywars || player.tiers.nodebuff || player.tiers.midfights || player.tiers.bridging);
+      const isBedrock = platform === 'bedrock' || (platform !== 'java' && hasBedrockTiers);
+
+      if (isBedrock) {
         return `https://api.mcheads.org/avatar/.${player.name}/right/192`;
       }
       return `https://api.mcheads.org/avatar/${player.name}/right/192`;
@@ -369,9 +374,14 @@
     function renderPodium() {
       const activePlayers = (appData.players || []).filter(p => {
         if (p.retired) return false;
+        
         const pPlatform = String(p.platform || 'java').toLowerCase();
-        if (currentPodiumMode === 'java' && pPlatform !== 'java') return false;
-        if (currentPodiumMode === 'bedrock' && pPlatform !== 'bedrock') return false;
+        const hasBedrockTiers = p.tiers && (p.tiers.skywars || p.tiers.nodebuff || p.tiers.midfights || p.tiers.bridging);
+        const hasJavaTiers = p.tiers && (p.tiers.sword || p.tiers.smp || p.tiers.crystal || p.tiers.mace || p.tiers.uhc || p.tiers.pot);
+
+        if (currentPodiumMode === 'java' && (pPlatform !== 'java' && !hasJavaTiers)) return false;
+        if (currentPodiumMode === 'bedrock' && (pPlatform !== 'bedrock' && !hasBedrockTiers)) return false;
+
         return calculatePoints(p, currentPodiumMode) > 0;
       });
 
@@ -424,8 +434,12 @@
             const playerTierVal = modeKey ? String(p.tiers[modeKey]).trim().toLowerCase() : '';
             const matchesMode = playerTierVal === sub.toLowerCase();
             
-            const playerPlatform = String(p.platform || 'java').toUpperCase();
-            const matchesPlatform = selectedPlatform === 'ALL' || playerPlatform === selectedPlatform;
+            const pPlatform = String(p.platform || 'java').toLowerCase();
+            const hasBedrockTiers = p.tiers && (p.tiers.skywars || p.tiers.nodebuff || p.tiers.midfights || p.tiers.bridging);
+            const isBedrock = pPlatform === 'bedrock' || hasBedrockTiers;
+            const detectedPlatform = isBedrock ? 'BEDROCK' : 'JAVA';
+
+            const matchesPlatform = selectedPlatform === 'ALL' || detectedPlatform === selectedPlatform;
 
             const playerRegion = String(p.region || 'NA').trim().toUpperCase();
             const matchesRegion = selectedRegion === 'ALL' || playerRegion === selectedRegion;
@@ -434,6 +448,10 @@
           });
 
           let playerCards = matchingPlayers.map(p => {
+            const pPlatform = String(p.platform || 'java').toLowerCase();
+            const hasBedrockTiers = p.tiers && (p.tiers.skywars || p.tiers.nodebuff || p.tiers.midfights || p.tiers.bridging);
+            const displayPlatform = (pPlatform === 'bedrock' || hasBedrockTiers) ? 'BEDROCK' : 'JAVA';
+
             return `
               <div onclick="selectPlayerFromSearch('${p.name}')" class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44 cursor-pointer hover:border-amber-400">
                 <div class="h-10 w-10 overflow-hidden relative shrink-0 border border-slate-700 bg-slate-950 flex justify-center">
@@ -441,7 +459,7 @@
                 </div>
                 <div class="overflow-hidden">
                   <div class="font-bold text-xs truncate">${p.name}</div>
-                  <div class="text-[10px] text-slate-400 font-mono">${p.platform ? p.platform.toUpperCase() : 'JAVA'} • ${p.region || 'NA'}</div>
+                  <div class="text-[10px] text-slate-400 font-mono">${displayPlatform} • ${p.region || 'NA'}</div>
                 </div>
               </div>
             `;
@@ -500,13 +518,17 @@
         }
         if (!tierBadges) tierBadges = '<span class="text-xs text-slate-500 italic">No assigned tiers</span>';
 
+        const pPlatform = String(p.platform || 'java').toLowerCase();
+        const hasBedrockTiers = p.tiers && (p.tiers.skywars || p.tiers.nodebuff || p.tiers.midfights || p.tiers.bridging);
+        const displayPlatform = (pPlatform === 'bedrock' || hasBedrockTiers) ? 'BEDROCK' : 'JAVA';
+
         return `
           <div class="brutalist-card p-3 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div class="flex items-center gap-3">
               <img src="${getRenderUrl(p)}" class="h-12 w-12 object-contain border border-slate-700 bg-slate-900 p-1">
               <div>
                 <h4 class="font-black text-sm text-white">${p.name} ${p.retired ? '<span class="text-[10px] text-amber-500 font-normal">(RETIRED)</span>' : ''}</h4>
-                <p class="text-[10px] text-slate-400 font-mono">${(p.platform || 'java').toUpperCase()} • Region: ${p.region || 'NA'} • Total: ${calculatePoints(p)} PTS</p>
+                <p class="text-[10px] text-slate-400 font-mono">${displayPlatform} • Region: ${p.region || 'NA'} • Total: ${calculatePoints(p)} PTS</p>
               </div>
             </div>
             <div class="flex flex-wrap gap-1 max-w-md">
