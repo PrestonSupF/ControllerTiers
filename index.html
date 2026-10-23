@@ -239,21 +239,17 @@
           const playerPromises = jsonFiles.map(file => fetch(file.download_url).then(r => r.json()));
           appData.players = await Promise.all(playerPromises);
         } else {
-          appData = getLocalData();
+          appData = { players: [] };
         }
       } catch (e) {
-        appData = getLocalData();
+        console.error('Failed to load tierlist from GitHub:', e);
+        appData = { players: [] };
       }
 
       renderPodium();
       if (!document.getElementById('view-tierlist').classList.contains('hidden')) {
         renderTierlist();
       }
-    }
-
-    function getLocalData() {
-      const stored = localStorage.getItem('controller_pvp_data');
-      return stored ? JSON.parse(stored) : { players: [] };
     }
 
     function switchTab(tab) {
@@ -358,14 +354,6 @@
         `;
       });
     }
-
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'controller_pvp_data') {
-        appData = getLocalData();
-        renderPodium();
-        renderTierlist();
-      }
-    });
 
     loadData();
   </script>
