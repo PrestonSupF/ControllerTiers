@@ -53,7 +53,7 @@
       <img src="https://cdn.discordapp.com/attachments/1550263119983546448/1562282042056646717/controller_trans.png?ex=6ad96c08&is=6ad81a88&hm=a8e107dc460a2f783808828c3e94449eb1198400f5f180aa9544b0258ddf9ae6&" 
            alt="Controller Logo" 
            class="h-10 w-10 object-contain"
-           onerror="this.onerror=null; this.src='https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=128';">
+           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
       <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP</h1>
     </div>
 
@@ -76,7 +76,7 @@
         <!-- #2 Rank -->
         <div class="flex flex-col items-center w-24 sm:w-32">
           <div class="h-28 sm:h-36 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-2-img" src="https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512" class="w-full h-full object-cover object-top scale-125 origin-top drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="2nd Place" onerror="this.onerror=null; this.src='https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512';">
+            <img id="podium-2-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="2nd Place" onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
           </div>
           <div class="w-full bg-slate-300 text-slate-900 font-black py-2 border-2 border-slate-400 shadow-[2px_2px_0px_#000]">2</div>
           <span id="podium-2-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full">---</span>
@@ -87,7 +87,7 @@
         <div class="flex flex-col items-center w-28 sm:w-36 -mt-6">
           <i class="fa-solid fa-crown text-amber-400 text-xl mb-1 animate-bounce"></i>
           <div class="h-32 sm:h-40 w-28 sm:w-36 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-1-img" src="https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512" class="w-full h-full object-cover object-top scale-125 origin-top drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]" alt="1st Place" onerror="this.onerror=null; this.src='https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512';">
+            <img id="podium-1-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]" alt="1st Place" onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
           </div>
           <div class="w-full bg-amber-400 text-black font-black py-3 border-2 border-amber-300 shadow-[3px_3px_0px_#000] text-lg">1</div>
           <span id="podium-1-name" class="font-bold text-sm sm:text-base mt-2 truncate w-full text-amber-400">---</span>
@@ -97,7 +97,7 @@
         <!-- #3 Rank -->
         <div class="flex flex-col items-center w-24 sm:w-32">
           <div class="h-24 sm:h-32 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-3-img" src="https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512" class="w-full h-full object-cover object-top scale-125 origin-top drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="3rd Place" onerror="this.onerror=null; this.src='https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512';">
+            <img id="podium-3-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="3rd Place" onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
           </div>
           <div class="w-full bg-amber-700 text-amber-100 font-black py-1.5 border-2 border-amber-600 shadow-[2px_2px_0px_#000]">3</div>
           <span id="podium-3-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full">---</span>
@@ -264,6 +264,17 @@
       if (tab === 'tierlist') renderTierlist();
     }
 
+    function getRenderUrl(player) {
+      if (!player || !player.name) {
+        return 'https://api.mcheads.org/avatar/2fach/right/192';
+      }
+      const platform = String(player.platform || 'java').toLowerCase();
+      if (platform === 'bedrock') {
+        return `https://api.mcheads.org/avatar/.${player.name}/right/192`;
+      }
+      return `https://api.mcheads.org/avatar/${player.name}/right/192`;
+    }
+
     function calculatePoints(player) {
       if (!player || !player.tiers || player.retired) return 0;
       const pointsMap = { 
@@ -292,13 +303,12 @@
         const ptsEl = document.getElementById(`podium-${rank}-pts`);
 
         if (player) {
-          const identifier = player.id || player.name;
-          imgEl.src = `https://mc-api.io/render/FULL/${identifier}?size=512`;
-          imgEl.onerror = () => { imgEl.src = 'https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512'; };
+          imgEl.src = getRenderUrl(player);
+          imgEl.onerror = () => { imgEl.src = 'https://api.mcheads.org/avatar/2fach/right/192'; };
           nameEl.textContent = player.name;
           ptsEl.textContent = `${calculatePoints(player)} PTS`;
         } else {
-          imgEl.src = 'https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=512';
+          imgEl.src = 'https://api.mcheads.org/avatar/2fach/right/192';
           nameEl.textContent = '---';
           ptsEl.textContent = '0 PTS';
         }
@@ -338,11 +348,10 @@
           });
 
           let playerCards = matchingPlayers.map(p => {
-            const identifier = p.id || p.name;
             return `
               <div class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44">
                 <div class="h-10 w-10 overflow-hidden relative shrink-0 border border-slate-700 bg-slate-950 flex justify-center">
-                  <img src="https://mc-api.io/render/FULL/${identifier}?size=256" class="w-full h-full object-cover object-top scale-125" onerror="this.src='https://mc-api.io/render/FULL/e01bfc2a-e084-4885-a5a4-e2bb745f1411?size=256'">
+                  <img src="${getRenderUrl(p)}" class="w-full h-full object-contain" onerror="this.src='https://api.mcheads.org/avatar/2fach/right/192'">
                 </div>
                 <div class="overflow-hidden">
                   <div class="font-bold text-xs truncate">${p.name}</div>
