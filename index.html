@@ -231,19 +231,37 @@
     let appData = { players: [] };
 
     async function loadData() {
+      // 1. First try reading local data (for offline/admin testing)
+      const localStored = localStorage.getItem('controller_pvp_data');
+      if (localStored) {
+        try {
+          appData = JSON.parse(localStored);
+        } catch (e) {
+          appData = { players: [] };
+        }
+      }
+
+      // 2. Fetch live JSON files directly from GitHub contents API
       try {
         const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/tierlist`);
         if (res.ok) {
           const files = await res.json();
           const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-          const playerPromises = jsonFiles.map(file => fetch(file.download_url).then(r => r.json()));
-          appData.players = await Promise.all(playerPromises);
-        } else {
-          appData = { players: [] };
+          
+          if (jsonFiles.length > 0) {
+            const playerPromises = jsonFiles.map(file => 
+              fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/tierlist/${file.name}`)
+                .then(r => r.json())
+            );
+            const remotePlayers = await Promise.all(playerPromises);
+            
+            if (remotePlayers.length > 0) {
+              appData.players = remotePlayers;
+            }
+          }
         }
       } catch (e) {
-        console.error('Failed to load tierlist from GitHub:', e);
-        appData = { players: [] };
+        console.warn('Could not reach GitHub API, rendering local data:', e);
       }
 
       renderPodium();
@@ -263,7 +281,7 @@
     }
 
     function calculatePoints(player) {
-      if (!player.tiers) return 0;
+      if (!player || !player.tiers) return 0;
       const pointsMap = { 
         'High S': 100, 'Low S': 90, 
         'High A': 80, 'Low A': 70, 
@@ -275,7 +293,7 @@
     }
 
     function renderPodium() {
-      const sortedPlayers = [...appData.players].sort((a, b) => calculatePoints(b) - calculatePoints(a));
+      const sortedPlayers = [...(appData.players || [])].sort((a, b) => calculatePoints(b) - calculatePoints(a));
       const top3 = sortedPlayers.slice(0, 3);
 
       [1, 2, 3].forEach((rank, index) => {
@@ -316,7 +334,7 @@
         let subTierHTML = '';
 
         subTiers.forEach(sub => {
-          const matchingPlayers = appData.players.filter(p => {
+          const matchingPlayers = (appData.players || []).filter(p => {
             const matchesMode = p.tiers && p.tiers[selectedMode] === sub;
             const matchesRegion = selectedRegion === 'ALL' || p.region === selectedRegion;
             return matchesMode && matchesRegion;
