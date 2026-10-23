@@ -133,23 +133,32 @@
       location.reload();
     }
 
+    // CORS-bypassing ID resolver
     async function resolvePlayerIdentifier(username) {
+      // 1. Try Ashcon API (CORS-friendly Mojang wrapper for Java UUIDs)
       try {
-        const javaRes = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
-        if (javaRes.ok) {
-          const javaData = await javaRes.json();
-          if (javaData && javaData.id) return javaData.id;
+        const ashconRes = await fetch(`https://api.ashcon.app/mojang/v2/user/${username}`);
+        if (ashconRes.ok) {
+          const ashconData = await ashconRes.json();
+          if (ashconData && ashconData.uuid) {
+            return ashconData.uuid.replace(/-/g, ''); // Clean 32-char UUID
+          }
         }
       } catch (e) {}
 
+      // 2. Fallback: Try xuid.io through CORS Proxy for Bedrock XUIDs
       try {
-        const bedrockRes = await fetch(`https://xuid.io/api/v1/xuid/${username}`);
+        const bedrockUrl = encodeURIComponent(`https://xuid.io/api/v1/xuid/${username}`);
+        const bedrockRes = await fetch(`https://corsproxy.io/?${bedrockUrl}`);
         if (bedrockRes.ok) {
           const bedrockData = await bedrockRes.json();
-          if (bedrockData && bedrockData.xuid) return bedrockData.xuid;
+          if (bedrockData && bedrockData.xuid) {
+            return bedrockData.xuid;
+          }
         }
       } catch (e) {}
 
+      // 3. Fallback to raw username if lookups fail
       return username;
     }
 
