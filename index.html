@@ -47,6 +47,11 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
 
+  <!-- DEBUG WARNING BANNER -->
+  <div id="debug-banner" class="hidden brutalist-card p-3 mb-4 bg-amber-900/40 border-amber-500 text-amber-200 text-xs font-mono flex items-center justify-between">
+    <span>⚠️ <strong class="uppercase">Notice:</strong> <span id="debug-text">No roster data loaded. Ensure a player is saved in admin.html.</span></span>
+  </div>
+
   <!-- TOP HEADER -->
   <header class="brutalist-card p-3 mb-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
@@ -231,24 +236,58 @@
     let appData = { players: [] };
 
     async function loadData() {
+      let loaded = false;
+
+      // Attempt 1: Raw GitHub Fetch from main
       try {
         const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/roster.json?t=${new Date().getTime()}`);
         if (res.ok) {
           const players = await res.json();
-          if (Array.isArray(players)) {
+          if (Array.isArray(players) && players.length > 0) {
             appData.players = players;
+            loaded = true;
           }
         }
       } catch (e) {
-        console.warn('Could not fetch public roster, checking local storage fallback:', e);
+        console.warn('Main branch fetch failed:', e);
+      }
+
+      // Attempt 2: Fallback to master branch if main was empty
+      if (!loaded) {
+        try {
+          const resMaster = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/master/roster.json?t=${new Date().getTime()}`);
+          if (resMaster.ok) {
+            const players = await resMaster.json();
+            if (Array.isArray(players) && players.length > 0) {
+              appData.players = players;
+              loaded = true;
+            }
+          }
+        } catch (e) {
+          console.warn('Master branch fetch failed:', e);
+        }
+      }
+
+      // Attempt 3: Fallback to local storage
+      if (!loaded) {
         const localStored = localStorage.getItem('controller_pvp_data');
         if (localStored) {
           try {
-            appData = JSON.parse(localStored);
-          } catch (err) {
-            appData = { players: [] };
-          }
+            const parsed = JSON.parse(localStored);
+            if (parsed.players && parsed.players.length > 0) {
+              appData.players = parsed.players;
+              loaded = true;
+            }
+          } catch (err) {}
         }
+      }
+
+      // Show/Hide Debug Banner
+      const banner = document.getElementById('debug-banner');
+      if (!loaded || !appData.players || appData.players.length === 0) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
       }
 
       renderPodium();
@@ -277,7 +316,8 @@
         'HIGH D': 20, 'LOW D': 10 
       };
       return Object.values(player.tiers).reduce((sum, tier) => {
-        const key = String(tier).toUpperCase();
+        if (!tier) return sum;
+        const key = String(tier).toUpperCase().trim();
         return sum + (pointsMap[key] || 0);
       }, 0);
     }
@@ -306,8 +346,8 @@
     }
 
     function renderTierlist() {
-      const selectedMode = document.getElementById('mode-select').value.toLowerCase();
-      const selectedRegion = document.getElementById('region-select').value.toUpperCase();
+      const selectedMode = document.getElementById('mode-select').value.toLowerCase().trim();
+      const selectedRegion = document.getElementById('region-select').value.toUpperCase().trim();
       const container = document.getElementById('tiers-container');
       container.innerHTML = '';
 
@@ -327,8 +367,8 @@
           const matchingPlayers = (appData.players || []).filter(p => {
             if (!p.tiers) return false;
             
-            // Case-insensitive key lookup for gamemodes
-            const modeKey = Object.keys(p.tiers).find(k => k.toLowerCase() === selectedMode);
+            // Case-insensitive key and value matching
+            const modeKey = Object.keys(p.tiers).find(k => k.toLowerCase().trim() === selectedMode);
             const playerTierVal = modeKey ? String(p.tiers[modeKey]).trim().toLowerCase() : '';
             const matchesMode = playerTierVal === sub.toLowerCase();
             
