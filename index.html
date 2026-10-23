@@ -231,37 +231,25 @@
     let appData = { players: [] };
 
     async function loadData() {
-      // 1. First try reading local data (for offline/admin testing)
-      const localStored = localStorage.getItem('controller_pvp_data');
-      if (localStored) {
-        try {
-          appData = JSON.parse(localStored);
-        } catch (e) {
-          appData = { players: [] };
-        }
-      }
-
-      // 2. Fetch live JSON files directly from GitHub contents API
+      // 1. Fetch the master roster.json directly from GitHub raw link (no CORS/rate limit issues)
       try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/tierlist`);
+        const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/roster.json?t=${new Date().getTime()}`);
         if (res.ok) {
-          const files = await res.json();
-          const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-          
-          if (jsonFiles.length > 0) {
-            const playerPromises = jsonFiles.map(file => 
-              fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/tierlist/${file.name}`)
-                .then(r => r.json())
-            );
-            const remotePlayers = await Promise.all(playerPromises);
-            
-            if (remotePlayers.length > 0) {
-              appData.players = remotePlayers;
-            }
+          const players = await res.json();
+          if (Array.isArray(players)) {
+            appData.players = players;
           }
         }
       } catch (e) {
-        console.warn('Could not reach GitHub API, rendering local data:', e);
+        console.warn('Could not fetch public roster, checking local storage fallback:', e);
+        const localStored = localStorage.getItem('controller_pvp_data');
+        if (localStored) {
+          try {
+            appData = JSON.parse(localStored);
+          } catch (err) {
+            appData = { players: [] };
+          }
+        }
       }
 
       renderPodium();
@@ -354,7 +342,7 @@
             playerCards = `<span class="text-xs text-slate-600 italic p-2">None</span>`;
           }
 
-          subTierHTML += `
+          subTier`subTierHTML` += `
             <div class="p-3 border-b border-slate-800/80 last:border-b-0">
               <span class="text-xs font-black uppercase text-slate-400 block mb-2">${sub}</span>
               <div class="flex flex-wrap gap-2">${playerCards}</div>
@@ -363,7 +351,7 @@
         });
 
         container.innerHTML += `
-          <div class="brutalist-card overflow-hidden">
+          <brutalist-card overflow-hidden>
             <div class="px-4 py-2 font-black uppercase text-sm ${tier.bgClass} flex justify-between items-center">
               <span>${tier.name}</span>
             </div>
