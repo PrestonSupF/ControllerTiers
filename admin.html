@@ -253,6 +253,12 @@
           } catch(e) {
             playersList = [];
           }
+        } else if (rosterRes.status === 404) {
+          // File does not exist on GitHub yet—initialize fresh roster
+          playersList = [];
+        } else {
+          const errData = await rosterRes.json();
+          throw new Error(`GitHub Roster Fetch Error: ${errData.message}`);
         }
 
         // Update or append player in the list
@@ -263,9 +269,6 @@
           playersList.push(playerObj);
         }
 
-        // Save local backup to browser storage
-        localStorage.setItem('controller_pvp_data', JSON.stringify({ players: playersList }));
-
         // Encode roster to UTF-8 Base64
         const jsonString = JSON.stringify(playersList, null, 2);
         const utf8Bytes = new TextEncoder().encode(jsonString);
@@ -273,7 +276,7 @@
         utf8Bytes.forEach(b => base64Content += String.fromCharCode(b));
         base64Content = btoa(base64Content);
 
-        // Commit directly to GitHub
+        // Commit directly to GitHub root
         const commitRes = await fetch(rosterUrl, {
           method: 'PUT',
           headers,
@@ -285,7 +288,7 @@
         });
 
         if (commitRes.ok) {
-          alert(`Success! Player "${name}" has been saved and committed directly to GitHub!`);
+          alert(`SUCCESS! Player "${name}" saved and committed to GitHub repository!\n\nAll external devices will see this update now.`);
         } else {
           const errData = await commitRes.json();
           alert(`GitHub Commit Error: ${errData.message || 'Check token permissions.'}`);
