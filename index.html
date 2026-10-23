@@ -270,13 +270,16 @@
     function calculatePoints(player) {
       if (!player || !player.tiers) return 0;
       const pointsMap = { 
-        'High S': 100, 'Low S': 90, 
-        'High A': 80, 'Low A': 70, 
-        'High B': 60, 'Low B': 50, 
-        'High C': 40, 'Low C': 30, 
-        'High D': 20, 'Low D': 10 
+        'HIGH S': 100, 'LOW S': 90, 
+        'HIGH A': 80, 'LOW A': 70, 
+        'HIGH B': 60, 'LOW B': 50, 
+        'HIGH C': 40, 'LOW C': 30, 
+        'HIGH D': 20, 'LOW D': 10 
       };
-      return Object.values(player.tiers).reduce((sum, tier) => sum + (pointsMap[tier] || 0), 0);
+      return Object.values(player.tiers).reduce((sum, tier) => {
+        const key = String(tier).toUpperCase();
+        return sum + (pointsMap[key] || 0);
+      }, 0);
     }
 
     function renderPodium() {
@@ -303,8 +306,8 @@
     }
 
     function renderTierlist() {
-      const selectedMode = document.getElementById('mode-select').value;
-      const selectedRegion = document.getElementById('region-select').value;
+      const selectedMode = document.getElementById('mode-select').value.toLowerCase();
+      const selectedRegion = document.getElementById('region-select').value.toUpperCase();
       const container = document.getElementById('tiers-container');
       container.innerHTML = '';
 
@@ -322,8 +325,16 @@
 
         subTiers.forEach(sub => {
           const matchingPlayers = (appData.players || []).filter(p => {
-            const matchesMode = p.tiers && p.tiers[selectedMode] === sub;
-            const matchesRegion = selectedRegion === 'ALL' || p.region === selectedRegion;
+            if (!p.tiers) return false;
+            
+            // Case-insensitive key lookup for gamemodes
+            const modeKey = Object.keys(p.tiers).find(k => k.toLowerCase() === selectedMode);
+            const playerTierVal = modeKey ? String(p.tiers[modeKey]).trim().toLowerCase() : '';
+            const matchesMode = playerTierVal === sub.toLowerCase();
+            
+            const playerRegion = String(p.region || 'NA').trim().toUpperCase();
+            const matchesRegion = selectedRegion === 'ALL' || playerRegion === selectedRegion;
+            
             return matchesMode && matchesRegion;
           });
 
