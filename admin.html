@@ -28,7 +28,7 @@
     </div>
   </div>
 
-  <!-- MAIN ADMIN CONTENT (HIDDEN UNTIL LOGIN) -->
+  <!-- MAIN ADMIN CONTENT -->
   <div id="admin-content" class="hidden flex flex-col gap-6">
 
     <header class="brutalist-card p-4 flex justify-between items-center">
@@ -43,8 +43,8 @@
     <section class="brutalist-card p-5 space-y-4">
       <h2 class="text-sm font-black uppercase text-slate-400">Player Management</h2>
       
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="sm:col-span-2">
           <label class="text-xs font-bold text-slate-300">Player Username</label>
           <input type="text" id="player-name" placeholder="e.g. Tynza" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
         </div>
@@ -93,7 +93,7 @@
         <button onclick="retirePlayerInFirebase()" id="retire-btn" class="brutalist-btn py-3 bg-amber-600 hover:bg-amber-500 text-white font-black uppercase text-xs tracking-wider">
           🌙 Retire Player
         </button>
-        <button onclick="removePlayerFromFirebase()" id="remove-btn" class="brutalist-btn py-3 bg-red-600 hover:bg-red-500 text-white font-black uppercase text-xs tracking-wider">
+        <button onclick="removePlayerFromFirebase()" id="remove-btn" class="brutalist-btn py-3 bg-red-600 hover:bg-red-800 text-white font-black uppercase text-xs tracking-wider">
           🗑️ Remove Player
         </button>
       </div>
@@ -105,12 +105,10 @@
     const ADMIN_PASS = "control";
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
 
-    // Check login state on load
     if (sessionStorage.getItem('admin_authenticated') === 'true') {
       showAdminContent();
     }
 
-    // Allow Enter key for password login
     document.getElementById('admin-pass-input').addEventListener('keyup', (e) => {
       if (e.key === 'Enter') authenticateAdmin();
     });
@@ -135,6 +133,26 @@
       location.reload();
     }
 
+    async function resolvePlayerIdentifier(username) {
+      try {
+        const javaRes = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
+        if (javaRes.ok) {
+          const javaData = await javaRes.json();
+          if (javaData && javaData.id) return javaData.id;
+        }
+      } catch (e) {}
+
+      try {
+        const bedrockRes = await fetch(`https://xuid.io/api/v1/xuid/${username}`);
+        if (bedrockRes.ok) {
+          const bedrockData = await bedrockRes.json();
+          if (bedrockData && bedrockData.xuid) return bedrockData.xuid;
+        }
+      } catch (e) {}
+
+      return username;
+    }
+
     async function savePlayerToFirebase() {
       const name = document.getElementById('player-name').value.trim();
       const region = document.getElementById('player-region').value;
@@ -142,11 +160,14 @@
       if (!name) { alert('Please enter a player username!'); return; }
 
       const btn = document.getElementById('save-btn');
-      btn.textContent = '⏳ Syncing...';
+      btn.textContent = '⏳ Resolving ID & Syncing...';
       btn.disabled = true;
+
+      const uniqueId = await resolvePlayerIdentifier(name);
 
       const playerObj = {
         name: name,
+        id: uniqueId,
         region: region,
         retired: false,
         tiers: {
@@ -171,7 +192,7 @@
         });
 
         if (res.ok) {
-          alert(`SUCCESS! "${name}" saved to database!`);
+          alert(`SUCCESS! "${name}" saved with ID (${uniqueId})!`);
         } else {
           alert('Firebase Error saving player.');
         }
@@ -186,15 +207,12 @@
     async function retirePlayerInFirebase() {
       const name = document.getElementById('player-name').value.trim();
       if (!name) { alert('Please enter a player username to retire!'); return; }
+      if (!confirm(`Mark "${name}" as RETIRED?`)) return;
 
-      if (!confirm(`Are you sure you want to mark "${name}" as RETIRED?`)) return;
-
-      const btn = document.getElementById('retire-btn');
-      btn.textContent = '⏳ Retiring...';
-      btn.disabled = true;
-
+      const uniqueId = await resolvePlayerIdentifier(name);
       const playerObj = {
         name: name,
+        id: uniqueId,
         region: document.getElementById('player-region').value,
         retired: true,
         tiers: {
@@ -203,52 +221,21 @@
         }
       };
 
-      try {
-        const res = await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(playerObj)
-        });
-
-        if (res.ok) {
-          alert(`SUCCESS! "${name}" has been marked as RETIRED and cleared from active tiers.`);
-        } else {
-          alert('Firebase Error retiring player.');
-        }
-      } catch (err) {
-        alert(`Exception: ${err.message}`);
-      } finally {
-        btn.textContent = '🌙 Retire Player';
-        btn.disabled = false;
-      }
+      await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(playerObj)
+      });
+      alert(`"${name}" is now retired.`);
     }
 
     async function removePlayerFromFirebase() {
       const name = document.getElementById('player-name').value.trim();
       if (!name) { alert('Please enter a player username to remove!'); return; }
+      if (!confirm(`PERMANENTLY REMOVE "${name}"?`)) return;
 
-      if (!confirm(`Are you sure you want to PERMANENTLY REMOVE "${name}" from the database?`)) return;
-
-      const btn = document.getElementById('remove-btn');
-      btn.textContent = '⏳ Removing...';
-      btn.disabled = true;
-
-      try {
-        const res = await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, {
-          method: 'DELETE'
-        });
-
-        if (res.ok) {
-          alert(`SUCCESS! "${name}" has been deleted from the tierlist.`);
-        } else {
-          alert('Firebase Error removing player.');
-        }
-      } catch (err) {
-        alert(`Exception: ${err.message}`);
-      } finally {
-        btn.textContent = '🗑️ Remove Player';
-        btn.disabled = false;
-      }
+      await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, { method: 'DELETE' });
+      alert(`"${name}" has been removed.`);
     }
   </script>
 </body>
