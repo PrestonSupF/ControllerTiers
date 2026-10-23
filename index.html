@@ -225,61 +225,21 @@
   </main>
 
   <script>
-    const GITHUB_OWNER = "PrestonSupF";
-    const GITHUB_REPO = "ControllerTiers";
+    const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
 
     let appData = { players: [] };
 
     async function loadData() {
-      let loadedData = false;
-
-      // 1. Fetch latest file commit hash to bypass GitHub's CDN cache completely
       try {
-        const commitRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/commits?path=roster.json&page=1&per_page=1`);
-        if (commitRes.ok) {
-          const commits = await commitRes.json();
-          if (commits.length > 0) {
-            const sha = commits[0].sha;
-            // Fetch exact raw file version by SHA
-            const rawRes = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${sha}/roster.json`);
-            if (rawRes.ok) {
-              const players = await rawRes.json();
-              if (Array.isArray(players)) {
-                appData.players = players;
-                loadedData = true;
-              }
-            }
+        const res = await fetch(`${FIREBASE_DB_URL}players.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            appData.players = Object.values(data);
           }
         }
       } catch (e) {
-        console.warn('Commit hash bypass failed, attempting standard fallback:', e);
-      }
-
-      // 2. Standard raw URL fallback with timestamp cache buster
-      if (!loadedData) {
-        try {
-          const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/roster.json?nocache=${Date.now()}`);
-          if (res.ok) {
-            const players = await res.json();
-            if (Array.isArray(players)) {
-              appData.players = players;
-              loadedData = true;
-            }
-          }
-        } catch (e) {}
-      }
-
-      // 3. Fallback to Local Storage backup
-      if (!loadedData) {
-        const localStored = localStorage.getItem('controller_pvp_data');
-        if (localStored) {
-          try {
-            const parsed = JSON.parse(localStored);
-            if (parsed.players && Array.isArray(parsed.players)) {
-              appData.players = parsed.players;
-            }
-          } catch (err) {}
-        }
+        console.warn('Firebase fetch failed:', e);
       }
 
       renderPodium();
