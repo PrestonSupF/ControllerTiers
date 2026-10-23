@@ -3,7 +3,12 @@
     "name": "PrestonSupF",
     "region": "NA",
     "tiers": {
-      "sword": "High S"
+      "sword": "High S",
+      "smp": "",
+      "crystal": "",
+      "mace": "",
+      "uhc": "",
+      "pot": ""
     }
   },
   {
