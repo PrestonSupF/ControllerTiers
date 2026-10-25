@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controller PvP | Admin Dashboard</title>
+  <title>Controller PvP | Java Tierlist</title>
+
+  <!-- Favicon / Tab Icon -->
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
 
   <!-- Open Graph / Discord & Social Embed Metadata -->
-  <meta property="og:title" content="Controller PvP | Admin Panel">
-  <meta property="og:description" content="Admin management panel for updating ranks and tier submissions.">
-  <meta property="og:url" content="https://psfpvp.xyz/admin.html">
+  <meta property="og:title" content="Controller PvP | Java Tierlist">
+  <meta property="og:description" content="View competitive Java Minecraft controller rankings across Sword, SMP, Crystal, Mace, UHC, and Pot gamemodes.">
+  <meta property="og:url" content="https://psfpvp.xyz/java.html">
   <meta property="og:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
   <meta property="og:type" content="website">
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Controller PvP | Java Tierlist">
+  <meta name="twitter:description" content="View competitive Java Minecraft controller rankings across Sword, SMP, Crystal, Mace, UHC, and Pot gamemodes.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,10 +40,11 @@
       box-shadow: 3px 3px 0px #000;
       transition: all 0.1s ease;
     }
-    .brutalist-btn:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0px #000;
-    }
+    .bg-tier-S { background-color: #FFD700; color: #000; }
+    .bg-tier-A { background-color: #38BDF8; color: #000; }
+    .bg-tier-B { background-color: #C0C0C0; color: #000; }
+    .bg-tier-C { background-color: #CD7F32; color: #000; }
+    .bg-tier-D { background-color: #4B5563; color: #fff; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
@@ -45,287 +55,344 @@
       <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png" 
            alt="Controller Logo" 
            class="h-10 w-10 object-contain"
-           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
-      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP - Admin Dashboard</h1>
+           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/LostInMotion/right/192';">
+      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP - Java</h1>
     </div>
 
     <nav class="flex items-center gap-2">
       <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Home</a>
-      <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-400">☕ Java</a>
+      <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-sky-500 text-black">☕ Java</a>
       <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">🧱 Bedrock</a>
     </nav>
   </header>
 
-  <!-- ADMIN MANAGEMENT CONTAINER -->
-  <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    <!-- ADD / EDIT PLAYER FORM -->
-    <section class="brutalist-card p-4 sm:p-6 lg:col-span-1 h-fit">
-      <h2 id="form-heading" class="text-lg font-black uppercase text-amber-400 mb-4 border-b border-slate-800 pb-2">Add / Edit Player</h2>
+  <!-- PLAYER PROFILE MODAL -->
+  <div id="player-profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+    <div class="brutalist-card bg-[#11161d] w-full max-w-lg p-6 relative border-sky-400/80 shadow-[6px_6px_0px_#000]">
+      <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold text-sm bg-slate-900 border border-slate-700 px-2.5 py-1 uppercase"><i class="fa-solid fa-xmark"></i></button>
       
-      <form id="player-form" onsubmit="savePlayer(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Minecraft Username</label>
-          <input type="text" id="admin-name" required placeholder="e.g. Tynza" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
+      <div class="flex items-center gap-4 mb-3 -mt-2">
+        <div class="w-16 h-16 rounded-full border-2 border-sky-400 bg-slate-950 overflow-hidden flex-shrink-0 shadow-[2px_2px_0px_#000]">
+          <img id="modal-avatar" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-cover">
         </div>
-
-        <div>
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Region</label>
-          <select id="admin-region" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white uppercase font-bold focus:outline-none">
-            <option value="NA">NA</option>
-            <option value="EU">EU</option>
-            <option value="AS">AS</option>
-            <option value="SA">SA</option>
-            <option value="OCE">OCE</option>
-          </select>
+        <div class="overflow-hidden">
+          <h2 id="modal-player-name" class="text-xl font-black text-white normal-case truncate">---</h2>
+          <p class="text-xs font-bold text-sky-400 uppercase tracking-wide">Tiers</p>
+          <p id="modal-rank-pts" class="text-xs font-mono text-slate-300 font-bold mt-0.5">#0 Overall (0 Points)</p>
+          <p id="modal-region" class="text-[11px] font-mono text-slate-400">Region: North America</p>
         </div>
-
-        <!-- Mode & Tier Dropdown Selector Section -->
-        <div class="space-y-3 pt-2 border-t border-slate-800">
-          <h3 class="text-xs font-black uppercase text-slate-400">Assign Mode Tiers</h3>
-          
-          <div class="space-y-2">
-            <div>
-              <label class="block text-[10px] text-sky-400 font-bold uppercase mb-1">Select Game Mode</label>
-              <select id="active-mode-select" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
-                <optgroup label="☕ Java Modes">
-                  <option value="sword">Sword</option>
-                  <option value="smp">SMP</option>
-                  <option value="crystal">Crystal</option>
-                  <option value="mace">Mace</option>
-                  <option value="uhc">UHC</option>
-                  <option value="pot">Pot</option>
-                </optgroup>
-                <optgroup label="🧱 Bedrock Modes">
-                  <option value="skywars">Skywars</option>
-                  <option value="nodebuff">Nodebuff</option>
-                  <option value="midfights">Midfights</option>
-                  <option value="bridging">Bridging</option>
-                </optgroup>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-[10px] text-amber-400 font-bold uppercase mb-1">Select Tier Rank</label>
-              <select id="active-tier-select" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
-                <option value="">-- No Tier / Unassigned --</option>
-                <option value="High S">High S</option>
-                <option value="Low S">Low S</option>
-                <option value="High A">High A</option>
-                <option value="Low A">Low A</option>
-                <option value="High B">High B</option>
-                <option value="Low B">Low B</option>
-                <option value="High C">High C</option>
-                <option value="Low C">Low C</option>
-                <option value="High D">High D</option>
-                <option value="Low D">Low D</option>
-              </select>
-            </div>
-
-            <button type="button" onclick="assignTierToPlayer()" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase px-3 py-2 w-full mt-1">
-              <i class="fa-solid fa-plus"></i> Set Mode Tier
-            </button>
-          </div>
-
-          <!-- Active Assigned Tiers Preview List -->
-          <div class="mt-3">
-            <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Current Assigned Tiers:</label>
-            <div id="assigned-tiers-preview" class="flex flex-wrap gap-1.5 p-2 bg-slate-900/80 border border-slate-800 min-h-[44px]">
-              <span class="text-[10px] text-slate-500 italic">No modes assigned yet</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="pt-2">
-          <label class="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer">
-            <input type="checkbox" id="admin-retired" class="w-4 h-4 accent-amber-400"> Retired Player
-          </label>
-        </div>
-
-        <div class="flex gap-2 pt-3">
-          <button type="submit" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase px-4 py-2.5 w-full">Save Player to DB</button>
-          <button type="button" onclick="resetForm()" class="brutalist-btn bg-slate-800 text-slate-300 font-bold text-xs uppercase px-3 py-2.5">Reset</button>
-        </div>
-      </form>
-    </section>
-
-    <!-- PLAYER LIST DATABASE MANAGEMENT -->
-    <section class="brutalist-card p-4 sm:p-6 lg:col-span-2">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
-        <h2 class="text-lg font-black uppercase text-amber-400">Registered Roster</h2>
-        <input type="text" id="roster-search" onkeyup="filterRoster()" placeholder="Filter roster..." class="bg-slate-900 border border-slate-700 px-3 py-1 text-xs text-white focus:outline-none">
       </div>
 
-      <div id="roster-list" class="space-y-2 max-h-[600px] overflow-y-auto pr-1">
-        <p class="text-xs text-slate-500 italic">Loading players from database...</p>
-      </div>
-    </section>
+      <div class="border-b border-slate-800 my-3"></div>
 
-  </main>
+      <div id="modal-tiers-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[320px] overflow-y-auto pr-1"></div>
+
+      <div class="mt-4 text-center">
+        <span class="text-[10px] text-slate-500 italic">Tap or hover to see peak tiers</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVA PODIUM -->
+  <section class="brutalist-card p-4 sm:p-6 text-center mb-6">
+    <h2 class="text-xs font-black text-sky-400 tracking-widest uppercase mb-1">Java Edition Ranks</h2>
+    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">☕ Java Overall Podium ☕</h3>
+
+    <!-- TOP 3 PODIUM -->
+    <div class="flex justify-center items-end gap-2 sm:gap-6 min-h-[220px]">
+      <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(2)">
+        <div class="h-28 sm:h-36 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
+          <img id="podium-2-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+        </div>
+        <div class="w-full bg-slate-300 text-slate-900 font-black py-2 border-2 border-slate-400">2</div>
+        <span id="podium-2-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full normal-case">---</span>
+        <span id="podium-2-pts" class="text-[10px] sm:text-xs text-slate-400 border border-slate-700 px-2 py-0.5 mt-1">0 PTS</span>
+      </div>
+
+      <div class="flex flex-col items-center w-28 sm:w-36 -mt-6 cursor-pointer" onclick="openPlayerModalFromRank(1)">
+        <i class="fa-solid fa-crown text-sky-400 text-xl mb-1 animate-bounce"></i>
+        <div class="h-32 sm:h-40 w-28 sm:w-36 overflow-hidden relative mb-2 flex justify-center">
+          <img id="podium-1-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+        </div>
+        <div class="w-full bg-sky-400 text-black font-black py-3 border-2 border-sky-300 text-lg">1</div>
+        <span id="podium-1-name" class="font-bold text-sm sm:text-base mt-2 truncate w-full text-sky-400 normal-case">---</span>
+        <span id="podium-1-pts" class="text-xs text-sky-400 border border-sky-400/40 px-2 py-0.5 mt-1 font-bold">0 PTS</span>
+      </div>
+
+      <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(3)">
+        <div class="h-24 sm:h-32 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
+          <img id="podium-3-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+        </div>
+        <div class="w-full bg-amber-700 text-amber-100 font-black py-1.5 border-2 border-amber-600">3</div>
+        <span id="podium-3-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full normal-case">---</span>
+        <span id="podium-3-pts" class="text-[10px] sm:text-xs text-slate-400 border border-slate-700 px-2 py-0.5 mt-1">0 PTS</span>
+      </div>
+    </div>
+
+    <!-- STACKED TOP 4 AND 5 -->
+    <div class="mt-8 max-w-md mx-auto space-y-2">
+      <!-- #4 Rank -->
+      <div onclick="openPlayerModalFromRank(4)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-sky-400 transition-colors">
+        <div class="flex items-center gap-3">
+          <span class="font-black text-sky-400 text-sm w-6">#4</span>
+          <img id="podium-4-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
+          <span id="podium-4-name" class="font-bold text-xs sm:text-sm text-white normal-case">---</span>
+        </div>
+        <span id="podium-4-pts" class="text-xs font-mono text-slate-400 border border-slate-700 px-2 py-0.5">0 PTS</span>
+      </div>
+
+      <!-- #5 Rank -->
+      <div onclick="openPlayerModalFromRank(5)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-sky-400 transition-colors">
+        <div class="flex items-center gap-3">
+          <span class="font-black text-sky-400 text-sm w-6">#5</span>
+          <img id="podium-5-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
+          <span id="podium-5-name" class="font-bold text-xs sm:text-sm text-white normal-case">---</span>
+        </div>
+        <span id="podium-5-pts" class="text-xs font-mono text-slate-400 border border-slate-700 px-2 py-0.5">0 PTS</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODE & REGION FILTERS -->
+  <div class="brutalist-card p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
+    <div class="flex items-center gap-2">
+      <label class="text-xs font-bold uppercase text-slate-400 flex items-center gap-2">
+        <img id="mode-icon-preview" src="" class="w-5 h-5 object-contain inline-block"> Mode:
+      </label>
+      <select id="mode-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase text-white">
+        <option value="sword">Sword</option>
+        <option value="smp">SMP</option>
+        <option value="crystal">Crystal</option>
+        <option value="mace">Mace</option>
+        <option value="uhc">UHC</option>
+        <option value="pot">Pot</option>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label class="text-xs font-bold uppercase text-slate-400">Region:</label>
+      <select id="region-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase text-white">
+        <option value="ALL">Global (All)</option>
+        <option value="NA">North America (NA)</option>
+        <option value="EU">Europe (EU)</option>
+        <option value="AS">Asia (AS)</option>
+        <option value="SA">South America (SA)</option>
+        <option value="OCE">Oceania (OCE)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- TIERS CONTAINER -->
+  <div id="tiers-container" class="space-y-4 mb-8"></div>
+
+  <!-- JAVA RULES -->
+  <div class="brutalist-card p-6">
+    <h2 class="text-xl font-black uppercase mb-4 border-b border-slate-800 pb-2 text-sky-400"><i class="fa-brands fa-java"></i> Java Competitive Rules (Neutral Ping)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+      <div class="brutalist-card p-3">
+        <h3 class="font-bold text-white uppercase mb-1">Sword & Pot</h3>
+        <p>First to 3 full matches wins.</p>
+      </div>
+      <div class="brutalist-card p-3">
+        <h3 class="font-bold text-white uppercase mb-1">SMP & Mace</h3>
+        <p>First to 2 full matches wins. Shield status mod is permitted.</p>
+      </div>
+      <div class="brutalist-card p-3">
+        <h3 class="font-bold text-white uppercase mb-1">Crystal</h3>
+        <p>First to 3 full matches wins. Max 14 totems. No turtle master potions.</p>
+      </div>
+      <div class="brutalist-card p-3">
+        <h3 class="font-bold text-white uppercase mb-1">UHC</h3>
+        <p>First to 3 full matches wins. Shield status mod is permitted.</p>
+      </div>
+    </div>
+  </div>
 
   <script>
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
-    let playersMap = {};
-    let currentEditingTiers = {};
+    const GITHUB_ICONS_BASE = "https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/";
 
-    async function loadAdminData() {
+    let appData = { players: [] };
+    let rankedPlayersCache = [];
+    const javaModes = ['sword', 'smp', 'crystal', 'mace', 'uhc', 'pot'];
+
+    const iconFilenameMap = {
+      'sword': 'sword.png', 'smp': 'smp.png', 'crystal': 'crystal.png',
+      'mace': 'mace.png', 'uhc': 'uhc.png', 'pot': 'pot.png',
+      'skywars': 'skywars.png', 'nodebuff': 'nodebuff.png',
+      'midfights': 'midfight.png', 'bridging': 'bridging.png'
+    };
+
+    function getModeIconUrl(mode) {
+      return GITHUB_ICONS_BASE + (iconFilenameMap[mode.toLowerCase()] || mode + '.png');
+    }
+
+    async function loadData() {
       try {
         const res = await fetch(`${FIREBASE_DB_URL}players.json`);
         if (res.ok) {
           const data = await res.json();
-          playersMap = data || {};
+          if (data) appData.players = Object.values(data);
         }
-      } catch (e) {
-        console.warn('Failed to load database:', e);
-      }
-      renderRoster();
+      } catch (e) { console.warn(e); }
+      renderPodium();
+      renderTierlist();
     }
 
-    function renderRoster() {
-      const container = document.getElementById('roster-list');
-      const keys = Object.keys(playersMap);
-
-      if (keys.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 italic">No players registered in database yet.</p>`;
-        return;
-      }
-
-      container.innerHTML = keys.map(key => {
-        const p = playersMap[key];
-        let tierSummary = '';
-        if (p.tiers) {
-          tierSummary = Object.entries(p.tiers).map(([m, t]) => `<span class="bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-400 uppercase">${m}: ${t}</span>`).join(' ');
+    function calculateJavaPoints(player) {
+      if (!player || !player.tiers || player.retired) return 0;
+      const pointsMap = { 'HIGH S': 100, 'LOW S': 90, 'HIGH A': 80, 'LOW A': 70, 'HIGH B': 60, 'LOW B': 50, 'HIGH C': 40, 'LOW C': 30, 'HIGH D': 20, 'LOW D': 10 };
+      
+      let total = 0;
+      Object.entries(player.tiers).forEach(([mode, tierVal]) => {
+        const cleanMode = mode.toLowerCase().trim();
+        if (javaModes.includes(cleanMode) && tierVal) {
+          const basePts = pointsMap[String(tierVal).toUpperCase().trim()] || 0;
+          total += basePts;
         }
-        return `
-          <div class="brutalist-card p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60">
-            <div class="flex items-center gap-3">
-              <img src="https://api.mcheads.org/avatar/${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain" onerror="this.src='https://api.mcheads.org/avatar/2fach/right/192'">
-              <div>
-                <h4 class="font-black text-sm text-white normal-case">${p.name} ${p.retired ? '<span class="text-[10px] text-amber-500 font-normal">(RETIRED)</span>' : ''}</h4>
-                <p class="text-[10px] text-slate-400 font-mono">Region: ${p.region || 'NA'}</p>
-                <div class="flex flex-wrap gap-1 mt-1">${tierSummary || '<span class="text-[10px] text-slate-500 italic">No tiers</span>'}</div>
-              </div>
-            </div>
-            <div class="flex gap-2 self-end sm:self-center">
-              <button onclick="editPlayer('${key}')" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white px-3 py-1 text-xs font-bold uppercase">Edit</button>
-              <button onclick="deletePlayer('${key}')" class="brutalist-btn bg-rose-600 hover:bg-rose-500 text-white px-3 py-1 text-xs font-bold uppercase">Delete</button>
-            </div>
-          </div>
-        `;
-      }).join('');
+      });
+      return Math.round(total);
     }
 
-    function assignTierToPlayer() {
-      const mode = document.getElementById('active-mode-select').value;
-      const tier = document.getElementById('active-tier-select').value;
+    function renderPodium() {
+      const activePlayers = (appData.players || []).filter(p => !p.retired && calculateJavaPoints(p) > 0);
+      rankedPlayersCache = activePlayers.sort((a, b) => calculateJavaPoints(b) - calculateJavaPoints(a));
 
-      if (!tier) {
-        delete currentEditingTiers[mode];
-      } else {
-        currentEditingTiers[mode] = tier;
-      }
-      renderAssignedPreview();
-    }
+      [1, 2, 3, 4, 5].forEach((rank, index) => {
+        const player = rankedPlayersCache[index];
+        const imgEl = document.getElementById(`podium-${rank}-img`);
+        const nameEl = document.getElementById(`podium-${rank}-name`);
+        const ptsEl = document.getElementById(`podium-${rank}-pts`);
 
-    function renderAssignedPreview() {
-      const container = document.getElementById('assigned-tiers-preview');
-      const entries = Object.entries(currentEditingTiers);
-
-      if (entries.length === 0) {
-        container.innerHTML = `<span class="text-[10px] text-slate-500 italic">No modes assigned yet</span>`;
-        return;
-      }
-
-      container.innerHTML = entries.map(([mode, tier]) => `
-        <span class="bg-slate-950 border border-slate-700 px-2 py-1 rounded text-[10px] font-bold inline-flex items-center gap-1.5 text-white">
-          <span class="text-amber-400 uppercase">${mode}:</span> ${tier}
-          <button type="button" onclick="removeModeTier('${mode}')" class="text-rose-400 hover:text-rose-300 ml-1"><i class="fa-solid fa-xmark"></i></button>
-        </span>
-      `).join('');
-    }
-
-    function removeModeTier(mode) {
-      delete currentEditingTiers[mode];
-      renderAssignedPreview();
-    }
-
-    async function savePlayer(event) {
-      event.preventDefault();
-      const name = document.getElementById('admin-name').value.trim();
-      const region = document.getElementById('admin-region').value;
-      const retired = document.getElementById('admin-retired').checked;
-
-      const playerObj = { name, region, retired, tiers: currentEditingTiers };
-      const firebaseKey = name.toLowerCase();
-
-      try {
-        const res = await fetch(`${FIREBASE_DB_URL}players/${firebaseKey}.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(playerObj)
-        });
-
-        if (res.ok) {
-          alert(`Successfully saved player: ${name}`);
-          resetForm();
-          loadAdminData();
+        if (player) {
+          imgEl.src = `https://api.mcheads.org/avatar/${player.name}/right/192`;
+          nameEl.textContent = player.name;
+          ptsEl.textContent = `${calculateJavaPoints(player)} PTS`;
         } else {
-          alert('Error saving player to database.');
+          imgEl.src = 'https://api.mcheads.org/avatar/LostInMotion/right/192';
+          nameEl.textContent = '---';
+          ptsEl.textContent = '0 PTS';
         }
-      } catch (e) {
-        console.error(e);
-        alert('Network error while saving player.');
-      }
-    }
-
-    function editPlayer(key) {
-      const p = playersMap[key];
-      if (!p) return;
-
-      document.getElementById('admin-name').value = p.name;
-      document.getElementById('admin-region').value = p.region || 'NA';
-      document.getElementById('admin-retired').checked = !!p.retired;
-
-      currentEditingTiers = p.tiers ? { ...p.tiers } : {};
-      renderAssignedPreview();
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function deletePlayer(key) {
-      if (!confirm(`Are you sure you want to delete ${key} from the database?`)) return;
-
-      try {
-        const res = await fetch(`${FIREBASE_DB_URL}players/${key}.json`, {
-          method: 'DELETE'
-        });
-
-        if (res.ok) {
-          loadAdminData();
-        } else {
-          alert('Failed to delete player.');
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    function resetForm() {
-      document.getElementById('player-form').reset();
-      currentEditingTiers = {};
-      renderAssignedPreview();
-    }
-
-    function filterRoster() {
-      const query = document.getElementById('roster-search').value.toLowerCase();
-      const cards = document.querySelectorAll('#roster-list > div');
-      cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(query) ? 'flex' : 'none';
       });
     }
 
-    loadAdminData();
+    function openPlayerModalFromRank(rankNum) {
+      const player = rankedPlayersCache[rankNum - 1];
+      if (player) {
+        openPlayerProfileModal(player, rankNum);
+      }
+    }
+
+    function openPlayerProfileModal(player, exactRank = null) {
+      if (!player) return;
+      const platform = String(player.platform || 'java').toLowerCase();
+      const hasBedrockTiers = player.tiers && (player.tiers.skywars || player.tiers.nodebuff || player.tiers.midfights || player.tiers.bridging);
+      const isBedrock = platform === 'bedrock' || (platform !== 'java' && hasBedrockTiers);
+      const avatarUrl = isBedrock ? `https://api.mcheads.org/avatar/.${player.name}/right/192` : `https://api.mcheads.org/avatar/${player.name}/right/192`;
+
+      document.getElementById('modal-avatar').src = avatarUrl;
+      document.getElementById('modal-player-name').textContent = player.name;
+      
+      let rankNum = exactRank;
+      if (!rankNum) {
+        const sorted = [...appData.players].filter(p => !p.retired && calculateJavaPoints(p) > 0).sort((a, b) => calculateJavaPoints(b) - calculateJavaPoints(a));
+        const idx = sorted.findIndex(p => p.name.toLowerCase() === player.name.toLowerCase());
+        rankNum = idx !== -1 ? idx + 1 : '-';
+      }
+
+      const totalPts = calculateJavaPoints(player);
+      document.getElementById('modal-rank-pts').textContent = `#${rankNum} Overall (${totalPts} Points)`;
+      document.getElementById('modal-region').textContent = `Region: ${player.region || 'North America'}`;
+
+      const gridContainer = document.getElementById('modal-tiers-grid');
+      gridContainer.innerHTML = '';
+
+      if (player.tiers && Object.keys(player.tiers).length > 0) {
+        Object.entries(player.tiers).forEach(([mode, tier]) => {
+          if (!tier) return;
+          const iconUrl = getModeIconUrl(mode);
+          gridContainer.innerHTML += `
+            <div class="flex items-center justify-between bg-slate-900 border border-slate-700/80 p-2 rounded">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <img src="${iconUrl}" class="w-5 h-5 object-contain flex-shrink-0" onerror="this.src='https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/sword.png'">
+                <span class="text-xs font-bold text-white uppercase truncate">${mode}</span>
+              </div>
+              <span class="bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider">${tier}</span>
+            </div>
+          `;
+        });
+      } else {
+        gridContainer.innerHTML = `<p class="text-xs text-slate-500 italic p-2 col-span-2">No assigned tiers</p>`;
+      }
+
+      document.getElementById('player-profile-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('player-profile-modal').classList.add('hidden');
+    }
+
+    function renderTierlist() {
+      const selectedMode = document.getElementById('mode-select').value.toLowerCase().trim();
+      const selectedRegion = document.getElementById('region-select').value.toUpperCase().trim();
+      const container = document.getElementById('tiers-container');
+      
+      document.getElementById('mode-icon-preview').src = getModeIconUrl(selectedMode);
+      container.innerHTML = '';
+
+      const tierDefs = [
+        { code: 'S', name: 'S Tier', bgClass: 'bg-tier-S' },
+        { code: 'A', name: 'A Tier', bgClass: 'bg-tier-A' },
+        { code: 'B', name: 'B Tier', bgClass: 'bg-tier-B' },
+        { code: 'C', name: 'C Tier', bgClass: 'bg-tier-C' },
+        { code: 'D', name: 'D Tier', bgClass: 'bg-tier-D' },
+      ];
+
+      tierDefs.forEach(tier => {
+        const subTiers = [`High ${tier.code}`, `Low ${tier.code}`];
+        let subTierHTML = '';
+
+        subTiers.forEach(sub => {
+          const matchingPlayers = (appData.players || []).filter(p => {
+            if (!p.tiers || p.retired) return false;
+            const modeKey = Object.keys(p.tiers).find(k => k.toLowerCase().trim() === selectedMode);
+            const playerTierVal = modeKey ? String(p.tiers[modeKey]).trim().toLowerCase() : '';
+            const matchesMode = playerTierVal === sub.toLowerCase();
+            const matchesRegion = selectedRegion === 'ALL' || (p.region || 'NA').toUpperCase() === selectedRegion;
+            return matchesMode && matchesRegion;
+          });
+
+          let playerCards = matchingPlayers.map(p => `
+            <div onclick="openPlayerProfileModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44 cursor-pointer hover:border-sky-400 transition-colors">
+              <img src="https://api.mcheads.org/avatar/${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain">
+              <div class="overflow-hidden">
+                <div class="font-bold text-xs truncate text-white normal-case">${p.name}</div>
+                <div class="text-[10px] text-slate-400 font-mono">JAVA • ${p.region || 'NA'}</div>
+              </div>
+            </div>
+          `).join('');
+
+          subTierHTML += `
+            <div class="p-3 border-b border-slate-800/80 last:border-b-0">
+              <span class="text-xs font-black uppercase text-slate-400 block mb-2">${sub}</span>
+              <div class="flex flex-wrap gap-2">${playerCards || '<span class="text-xs text-slate-600 italic p-2">None</span>'}</div>
+            </div>
+          `;
+        });
+
+        container.innerHTML += `
+          <div class="brutalist-card overflow-hidden">
+            <div class="px-4 py-2 font-black uppercase text-sm ${tier.bgClass} flex items-center gap-2">
+              <img src="${getModeIconUrl(selectedMode)}" class="w-5 h-5 object-contain">
+              <span>${tier.name}</span>
+            </div>
+            ${subTierHTML}
+          </div>
+        `;
+      });
+    }
+
+    loadData();
   </script>
 </body>
 </html>
