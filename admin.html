@@ -244,7 +244,6 @@
       }).join('');
     }
 
-    // Check if selected tier is High B or above to toggle Fight scores
     function checkTierSelection() {
       const tierVal = document.getElementById('active-tier-select').value;
       const highScoresContainer = document.getElementById('high-test-scores-container');
@@ -258,8 +257,6 @@
       }
     }
 
-    // High Tier = High B, Low A, High A, Low S, High S
-    // Low B is explicitly excluded and treated as a Low Test
     function isHighTier(tierStr) {
       if (!tierStr) return false;
       const t = tierStr.toUpperCase().trim();
@@ -274,7 +271,7 @@
     function assignTierToPlayer() {
       const mode = document.getElementById('active-mode-select').value;
       const tier = document.getElementById('active-tier-select').value;
-      const prevTier = document.getElementById('active-prev-tier').value.trim() || "None";
+      const prevTier = document.getElementById('active-prev-tier').value.trim() || "Unranked";
       const fight1 = document.getElementById('fight-1-score').value.trim();
       const fight2 = document.getElementById('fight-2-score').value.trim();
 
@@ -289,7 +286,6 @@
         };
       }
       renderAssignedPreview();
-      // Reset selectors
       document.getElementById('active-tier-select').value = "";
       document.getElementById('active-prev-tier').value = "";
       document.getElementById('fight-1-score').value = "";
@@ -339,7 +335,6 @@
         });
 
         if (res.ok) {
-          // Send Webhooks for each newly assigned tier
           for (const [mode, tierData] of Object.entries(currentEditingTiers)) {
             await sendTestWebhooks(name, region, mode, tierData);
           }
@@ -356,66 +351,42 @@
       }
     }
 
-    // WEBHOOK ROUTING & FORMATTING
+    // DISCORD EMBED WEBHOOK ROUTING
     async function sendTestWebhooks(username, region, mode, tierData) {
       const tierName = typeof tierData === 'object' ? tierData.tier : tierData;
-      const prevTier = typeof tierData === 'object' ? (tierData.prevTier || "None") : "None";
+      const prevTier = typeof tierData === 'object' ? (tierData.prevTier || "Unranked") : "Unranked";
       const isHigh = isHighTier(tierName);
 
-      let webhookPayload = {};
-      let targetWebhookUrl = "";
+      const targetWebhookUrl = isHigh ? HIGH_TEST_WEBHOOK_URL : LOW_TEST_WEBHOOK_URL;
+      const titleText = isHigh ? "High Test Results 🏆" : "Low Test Results 🏆";
+      
+      // Determine avatar render URL based on Bedrock vs Java naming convention or default fallback
+      const avatarUrl = `https://api.mcheads.org/avatar/${username}/right/192`;
+
+      let fieldsArray = [
+        { name: "Region:", value: region, inline: false },
+        { name: "Gamemode:", value: mode.toUpperCase(), inline: false },
+        { name: "Username:", value: username, inline: false },
+        { name: "Previous Tier:", value: prevTier, inline: false },
+        { name: "Tier Received:", value: tierName, inline: false }
+      ];
 
       if (isHigh) {
-        targetWebhookUrl = HIGH_TEST_WEBHOOK_URL;
-        const score1 = tierData.fight1 || "N/A";
-        const score2 = tierData.fight2 || "N/A";
-
-        const markdownText = 
-`## High Test
-**Region:**
-${region}
-
-**Gamemode:**
-${mode.toUpperCase()}
-
-**Username:**
-${username}   
-
-**Previous Tier:**
-${prevTier}
-
-**Tier Received:**
-${tierName}
-
-**Fight 1**
-${score1}
-**Fight 2**
-${score2}`;
-
-        webhookPayload = { content: markdownText };
-
-      } else {
-        targetWebhookUrl = LOW_TEST_WEBHOOK_URL;
-
-        const markdownText = 
-`## Low Test
-**Region:**
-${region}
-
-**Gamemode:**
-${mode.toUpperCase()}
-
-**Username:**
-${username}   
-
-**Previous Tier:**
-${prevTier}
-
-**Tier Received:**
-${tierName}`;
-
-        webhookPayload = { content: markdownText };
+        fieldsArray.push(
+          { name: "Fight 1", value: tierData.fight1 || "N/A", inline: false },
+          { name: "Fight 2", value: tierData.fight2 || "N/A", inline: false }
+        );
       }
+
+      const embedPayload = {
+        username: "Controller Tiers Bot",
+        embeds: [{
+          title: titleText,
+          color: 0x11161D, // Dark box tone
+          thumbnail: { url: avatarUrl },
+          fields: fieldsArray
+        }]
+      };
 
       if (!targetWebhookUrl || targetWebhookUrl.includes("YOUR_WEBHOOK")) return;
 
@@ -423,10 +394,10 @@ ${tierName}`;
         await fetch(targetWebhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(webhookPayload)
+          body: JSON.stringify(embedPayload)
         });
       } catch (err) {
-        console.error("Failed to transmit test webhook:", err);
+        console.error("Failed to transmit embed webhook:", err);
       }
     }
 
