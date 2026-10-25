@@ -54,13 +54,32 @@
 
     <nav class="flex items-center gap-2">
       <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Home</a>
-      <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-400">☕ Java</a>
-      <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">🧱 Bedrock</a>
+      <button id="sign-out-btn" onclick="signOutAdmin()" class="hidden brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-rose-600 hover:bg-rose-500 text-white"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
     </nav>
   </header>
 
-  <!-- ADMIN MANAGEMENT CONTAINER -->
-  <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- ACCESS GATE SCREEN -->
+  <div id="auth-gate-modal" class="flex-grow flex items-center justify-center p-4">
+    <div class="brutalist-card bg-[#11161d] w-full max-w-md p-6 border-amber-400/80 shadow-[6px_6px_0px_#000]">
+      <h2 class="text-lg font-black uppercase text-amber-400 mb-1"><i class="fa-solid fa-lock"></i> Admin Authentication</h2>
+      <p class="text-xs text-slate-400 mb-4">Please enter your Minecraft username and access code to proceed.</p>
+      
+      <form onsubmit="authenticateAdmin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Minecraft Username</label>
+          <input type="text" id="tester-username-input" required placeholder="e.g. spinninback" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Access Code</label>
+          <input type="password" id="admin-passcode-input" required placeholder="Enter code..." class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
+        </div>
+        <button type="submit" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase px-4 py-2.5 w-full">Access Panel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN MANAGEMENT CONTAINER (Hidden until authenticated) -->
+  <main id="admin-panel-container" class="hidden grid-cols-1 lg:grid-cols-3 gap-6">
 
     <!-- ADD / EDIT PLAYER FORM -->
     <section class="brutalist-card p-4 sm:p-6 lg:col-span-1 h-fit">
@@ -127,15 +146,37 @@
 
             <div>
               <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Previous Evaluation Tier</label>
-              <input type="text" id="active-prev-tier" placeholder="e.g. Low C or None" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+              <select id="active-prev-tier" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+                <option value="Unranked">Unranked</option>
+                <option value="High S">High S</option>
+                <option value="Low S">Low S</option>
+                <option value="High A">High A</option>
+                <option value="Low A">Low A</option>
+                <option value="High B">High B</option>
+                <option value="Low B">Low B</option>
+                <option value="High C">High C</option>
+                <option value="Low C">Low C</option>
+                <option value="High D">High D</option>
+                <option value="Low D">Low D</option>
+              </select>
             </div>
 
-            <!-- DYNAMIC HIGH TEST FIGHT SCORES (Appears for High B and above) -->
-            <div id="high-test-scores-container" class="hidden space-y-2 p-2.5 bg-amber-950/20 border border-amber-500/40 rounded mt-2">
+            <!-- DYNAMIC HIGH TEST FIGHT SCORES & TESTER INPUTS -->
+            <div id="high-test-scores-container" class="hidden space-y-2.5 p-2.5 bg-amber-950/20 border border-amber-500/40 rounded mt-2">
               <span class="text-[10px] text-amber-400 font-black uppercase block"><i class="fa-solid fa-trophy"></i> High Test Scores Required (High B+)</span>
+              
+              <div>
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 1 Tester IGN</label>
+                <input type="text" id="fight-1-tester" placeholder="e.g. spinninback" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
               <div>
                 <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 1 Score</label>
                 <input type="text" id="fight-1-score" placeholder="e.g. 3-1" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+
+              <div class="pt-1 border-t border-amber-500/20">
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 2 Tester IGN</label>
+                <input type="text" id="fight-2-tester" placeholder="e.g. Tynza" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
               </div>
               <div>
                 <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 2 Score</label>
@@ -186,13 +227,50 @@
 
   <script>
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
+    const ADMIN_PASSCODE = "controller123"; // Change code here if desired
     
     // Webhook URLs
     const LOW_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1563983888798318636/6dZ0Y5UAD3kAHKRfvEJH4ZZM8ogEBAp4d958UP8Qcl7PUmzNEE_kTW1hzHZmhQMBwVK5";
     const HIGH_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1563983887997206669/no9_B-op6ic7PMLgKlxPqRljD_W0hHMMBeF6W_vGVpCrM4oMJ12bTm-u4pzNcG-ln0Pq";
 
     let playersMap = {};
-    let currentEditingTiers = {}; // Stores { mode: { tier, prevTier, fight1, fight2 } }
+    let currentEditingTiers = {}; 
+    let currentTesterUsername = "";
+
+    function authenticateAdmin(event) {
+      event.preventDefault();
+      const usernameInput = document.getElementById('tester-username-input').value.trim();
+      const passcodeInput = document.getElementById('admin-passcode-input').value.trim();
+
+      if (passcodeInput !== ADMIN_PASSCODE) {
+        alert("Incorrect access code!");
+        return;
+      }
+
+      if (!usernameInput) {
+        alert("Please enter your Minecraft username.");
+        return;
+      }
+
+      currentTesterUsername = usernameInput;
+      document.getElementById('auth-gate-modal').classList.add('hidden');
+      const panel = document.getElementById('admin-panel-container');
+      panel.classList.remove('hidden');
+      panel.classList.add('grid');
+      document.getElementById('sign-out-btn').classList.remove('hidden');
+
+      loadAdminData();
+    }
+
+    function signOutAdmin() {
+      currentTesterUsername = "";
+      document.getElementById('admin-passcode-input').value = "";
+      document.getElementById('tester-username-input').value = "";
+      document.getElementById('admin-panel-container').classList.add('hidden');
+      document.getElementById('admin-panel-container').classList.remove('grid');
+      document.getElementById('sign-out-btn').classList.add('hidden');
+      document.getElementById('auth-gate-modal').classList.remove('hidden');
+    }
 
     async function loadAdminData() {
       try {
@@ -250,9 +328,17 @@
       
       if (isHighTier(tierVal)) {
         highScoresContainer.classList.remove('hidden');
+        if (!document.getElementById('fight-1-tester').value) {
+          document.getElementById('fight-1-tester').value = currentTesterUsername;
+        }
+        if (!document.getElementById('fight-2-tester').value) {
+          document.getElementById('fight-2-tester').value = currentTesterUsername;
+        }
       } else {
         highScoresContainer.classList.add('hidden');
+        document.getElementById('fight-1-tester').value = '';
         document.getElementById('fight-1-score').value = '';
+        document.getElementById('fight-2-tester').value = '';
         document.getElementById('fight-2-score').value = '';
       }
     }
@@ -271,9 +357,11 @@
     function assignTierToPlayer() {
       const mode = document.getElementById('active-mode-select').value;
       const tier = document.getElementById('active-tier-select').value;
-      const prevTier = document.getElementById('active-prev-tier').value.trim() || "Unranked";
-      const fight1 = document.getElementById('fight-1-score').value.trim();
-      const fight2 = document.getElementById('fight-2-score').value.trim();
+      const prevTier = document.getElementById('active-prev-tier').value;
+      const fight1Tester = document.getElementById('fight-1-tester').value.trim() || currentTesterUsername;
+      const fight1Score = document.getElementById('fight-1-score').value.trim();
+      const fight2Tester = document.getElementById('fight-2-tester').value.trim() || currentTesterUsername;
+      const fight2Score = document.getElementById('fight-2-score').value.trim();
 
       if (!tier) {
         delete currentEditingTiers[mode];
@@ -281,14 +369,19 @@
         currentEditingTiers[mode] = {
           tier: tier,
           prevTier: prevTier,
-          fight1: isHighTier(tier) ? fight1 : null,
-          fight2: isHighTier(tier) ? fight2 : null
+          tester: currentTesterUsername,
+          fight1Tester: isHighTier(tier) ? fight1Tester : null,
+          fight1: isHighTier(tier) ? fight1Score : null,
+          fight2Tester: isHighTier(tier) ? fight2Tester : null,
+          fight2: isHighTier(tier) ? fight2Score : null
         };
       }
       renderAssignedPreview();
       document.getElementById('active-tier-select').value = "";
-      document.getElementById('active-prev-tier').value = "";
+      document.getElementById('active-prev-tier').value = "Unranked";
+      document.getElementById('fight-1-tester').value = "";
       document.getElementById('fight-1-score').value = "";
+      document.getElementById('fight-2-tester').value = "";
       document.getElementById('fight-2-score').value = "";
       document.getElementById('high-test-scores-container').classList.add('hidden');
     }
@@ -351,19 +444,19 @@
       }
     }
 
-    // DISCORD EMBED WEBHOOK ROUTING
+    // DISCORD EMBED WEBHOOK ROUTING WITH TESTER FIELDS
     async function sendTestWebhooks(username, region, mode, tierData) {
       const tierName = typeof tierData === 'object' ? tierData.tier : tierData;
       const prevTier = typeof tierData === 'object' ? (tierData.prevTier || "Unranked") : "Unranked";
+      const testerIGN = (typeof tierData === 'object' && tierData.tester) ? tierData.tester : currentTesterUsername;
       const isHigh = isHighTier(tierName);
 
       const targetWebhookUrl = isHigh ? HIGH_TEST_WEBHOOK_URL : LOW_TEST_WEBHOOK_URL;
       const titleText = isHigh ? "High Test Results 🏆" : "Low Test Results 🏆";
-      
-      // Determine avatar render URL based on Bedrock vs Java naming convention or default fallback
       const avatarUrl = `https://api.mcheads.org/avatar/${username}/right/192`;
 
       let fieldsArray = [
+        { name: "Tester:", value: testerIGN, inline: false },
         { name: "Region:", value: region, inline: false },
         { name: "Gamemode:", value: mode.toUpperCase(), inline: false },
         { name: "Username:", value: username, inline: false },
@@ -372,9 +465,11 @@
       ];
 
       if (isHigh) {
+        const f1Tester = tierData.fight1Tester || testerIGN;
+        const f2Tester = tierData.fight2Tester || testerIGN;
         fieldsArray.push(
-          { name: "Fight 1", value: tierData.fight1 || "N/A", inline: false },
-          { name: "Fight 2", value: tierData.fight2 || "N/A", inline: false }
+          { name: `Fight 1 (Tester: ${f1Tester})`, value: tierData.fight1 || "N/A", inline: false },
+          { name: `Fight 2 (Tester: ${f2Tester})`, value: tierData.fight2 || "N/A", inline: false }
         );
       }
 
@@ -382,7 +477,7 @@
         username: "Controller Tiers Bot",
         embeds: [{
           title: titleText,
-          color: 0x11161D, // Dark box tone
+          color: 0x11161D,
           thumbnail: { url: avatarUrl },
           fields: fieldsArray
         }]
@@ -448,8 +543,6 @@
         card.style.display = text.includes(query) ? 'flex' : 'none';
       });
     }
-
-    loadAdminData();
   </script>
 </body>
 </html>
