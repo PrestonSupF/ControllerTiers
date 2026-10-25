@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controller PvP | Bedrock Tierlist</title>
 
+  <!-- Favicon / Tab Icon -->
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
+
   <!-- Open Graph / Discord & Social Embed Metadata -->
   <meta property="og:title" content="Controller PvP | Bedrock Tierlist">
   <meta property="og:description" content="View competitive Bedrock Minecraft controller rankings across Skywars, Nodebuff, Midfights, and Bridging gamemodes.">
@@ -52,7 +55,7 @@
       <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png" 
            alt="Controller Logo" 
            class="h-10 w-10 object-contain"
-           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
+           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/LostInMotion/right/192';">
       <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP - Bedrock</h1>
     </div>
 
@@ -70,7 +73,7 @@
       
       <div class="flex items-center gap-4 mb-3 -mt-2">
         <div class="w-16 h-16 rounded-full border-2 border-emerald-400 bg-slate-950 overflow-hidden flex-shrink-0 shadow-[2px_2px_0px_#000]">
-          <img id="modal-avatar" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-cover">
+          <img id="modal-avatar" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-cover">
         </div>
         <div class="overflow-hidden">
           <h2 id="modal-player-name" class="text-xl font-black text-white normal-case truncate">---</h2>
@@ -99,7 +102,7 @@
     <div class="flex justify-center items-end gap-2 sm:gap-6 min-h-[220px]">
       <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(2)">
         <div class="h-28 sm:h-36 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-          <img id="podium-2-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain">
+          <img id="podium-2-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
         </div>
         <div class="w-full bg-slate-300 text-slate-900 font-black py-2 border-2 border-slate-400">2</div>
         <span id="podium-2-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full normal-case">---</span>
@@ -109,7 +112,7 @@
       <div class="flex flex-col items-center w-28 sm:w-36 -mt-6 cursor-pointer" onclick="openPlayerModalFromRank(1)">
         <i class="fa-solid fa-crown text-emerald-400 text-xl mb-1 animate-bounce"></i>
         <div class="h-32 sm:h-40 w-28 sm:w-36 overflow-hidden relative mb-2 flex justify-center">
-          <img id="podium-1-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain">
+          <img id="podium-1-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
         </div>
         <div class="w-full bg-emerald-400 text-black font-black py-3 border-2 border-emerald-300 text-lg">1</div>
         <span id="podium-1-name" class="font-bold text-sm sm:text-base mt-2 truncate w-full text-emerald-400 normal-case">---</span>
@@ -118,7 +121,7 @@
 
       <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(3)">
         <div class="h-24 sm:h-32 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-          <img id="podium-3-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain">
+          <img id="podium-3-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
         </div>
         <div class="w-full bg-amber-700 text-amber-100 font-black py-1.5 border-2 border-amber-600">3</div>
         <span id="podium-3-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full normal-case">---</span>
@@ -132,7 +135,7 @@
       <div onclick="openPlayerModalFromRank(4)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-emerald-400 transition-colors">
         <div class="flex items-center gap-3">
           <span class="font-black text-emerald-400 text-sm w-6">#4</span>
-          <img id="podium-4-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
+          <img id="podium-4-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
           <span id="podium-4-name" class="font-bold text-xs sm:text-sm text-white normal-case">---</span>
         </div>
         <span id="podium-4-pts" class="text-xs font-mono text-slate-400 border border-slate-700 px-2 py-0.5">0 PTS</span>
@@ -142,7 +145,7 @@
       <div onclick="openPlayerModalFromRank(5)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-emerald-400 transition-colors">
         <div class="flex items-center gap-3">
           <span class="font-black text-emerald-400 text-sm w-6">#5</span>
-          <img id="podium-5-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
+          <img id="podium-5-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
           <span id="podium-5-name" class="font-bold text-xs sm:text-sm text-white normal-case">---</span>
         </div>
         <span id="podium-5-pts" class="text-xs font-mono text-slate-400 border border-slate-700 px-2 py-0.5">0 PTS</span>
@@ -259,7 +262,7 @@
           nameEl.textContent = player.name;
           ptsEl.textContent = `${calculateBedrockPoints(player)} PTS`;
         } else {
-          imgEl.src = 'https://api.mcheads.org/avatar/2fach/right/192';
+          imgEl.src = 'https://api.mcheads.org/avatar/LostInMotion/right/192';
           nameEl.textContent = '---';
           ptsEl.textContent = '0 PTS';
         }
