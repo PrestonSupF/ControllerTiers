@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controller PvP | Java Tierlist</title>
+
+  <!-- Open Graph / Discord & Social Embed Metadata -->
+  <meta property="og:title" content="Controller PvP | Java Tierlist">
+  <meta property="og:description" content="View competitive Java Minecraft controller rankings across Sword, SMP, Crystal, Mace, UHC, and Pot gamemodes.">
+  <meta property="og:url" content="https://psfpvp.xyz/java.html">
+  <meta property="og:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Controller PvP | Java Tierlist">
+  <meta name="twitter:description" content="View competitive Java Minecraft controller rankings across Sword, SMP, Crystal, Mace, UHC, and Pot gamemodes.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -44,8 +58,8 @@
 
     <nav class="flex items-center gap-2">
       <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Home</a>
-      <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-sky-500 text-black">Java</a>
-      <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">Bedrock</a>
+      <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-sky-500 text-black">☕ Java</a>
+      <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">🧱 Bedrock</a>
     </nav>
   </header>
 
@@ -79,7 +93,7 @@
   <!-- JAVA PODIUM -->
   <section class="brutalist-card p-4 sm:p-6 text-center mb-6">
     <h2 class="text-xs font-black text-sky-400 tracking-widest uppercase mb-1">Java Edition Ranks</h2>
-    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">Java Overall Podium</h3>
+    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">☕ Java Overall Podium ☕</h3>
 
     <!-- TOP 3 PODIUM -->
     <div class="flex justify-center items-end gap-2 sm:gap-6 min-h-[220px]">
@@ -198,7 +212,6 @@
     let appData = { players: [] };
     let rankedPlayersCache = [];
     const javaModes = ['sword', 'smp', 'crystal', 'mace', 'uhc', 'pot'];
-    const bedrockModesList = ['skywars', 'nodebuff', 'midfights', 'bridging'];
 
     const iconFilenameMap = {
       'sword': 'sword.png', 'smp': 'smp.png', 'crystal': 'crystal.png',
@@ -232,7 +245,7 @@
         const cleanMode = mode.toLowerCase().trim();
         if (javaModes.includes(cleanMode) && tierVal) {
           const basePts = pointsMap[String(tierVal).toUpperCase().trim()] || 0;
-          total += basePts; // Java normal points
+          total += basePts;
         }
       });
       return Math.round(total);
