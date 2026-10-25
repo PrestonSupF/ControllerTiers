@@ -227,7 +227,7 @@
 
   <script>
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
-    const ADMIN_PASSCODE = "controller123"; // Change code here if desired
+    const ADMIN_PASSCODE = "controller123";
     
     // Webhook URLs
     const LOW_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1563983888798318636/6dZ0Y5UAD3kAHKRfvEJH4ZZM8ogEBAp4d958UP8Qcl7PUmzNEE_kTW1hzHZmhQMBwVK5";
@@ -455,22 +455,32 @@
       const titleText = isHigh ? "High Test Results 🏆" : "Low Test Results 🏆";
       const avatarUrl = `https://api.mcheads.org/avatar/${username}/right/192`;
 
-      let fieldsArray = [
-        { name: "Tester:", value: testerIGN, inline: false },
-        { name: "Region:", value: region, inline: false },
-        { name: "Gamemode:", value: mode.toUpperCase(), inline: false },
-        { name: "Username:", value: username, inline: false },
-        { name: "Previous Tier:", value: prevTier, inline: false },
-        { name: "Tier Received:", value: tierName, inline: false }
-      ];
+      let fieldsArray = [];
 
       if (isHigh) {
+        // High Test Embed (No top Tester field, only individual fight testers below)
         const f1Tester = tierData.fight1Tester || testerIGN;
         const f2Tester = tierData.fight2Tester || testerIGN;
-        fieldsArray.push(
+
+        fieldsArray = [
+          { name: "Region:", value: region, inline: false },
+          { name: "Gamemode:", value: mode.toUpperCase(), inline: false },
+          { name: "Username:", value: username, inline: false },
+          { name: "Previous Tier:", value: prevTier, inline: false },
+          { name: "Tier Received:", value: tierName, inline: false },
           { name: `Fight 1 (Tester: ${f1Tester})`, value: tierData.fight1 || "N/A", inline: false },
           { name: `Fight 2 (Tester: ${f2Tester})`, value: tierData.fight2 || "N/A", inline: false }
-        );
+        ];
+      } else {
+        // Low Test Embed (Includes top Tester field)
+        fieldsArray = [
+          { name: "Tester:", value: testerIGN, inline: false },
+          { name: "Region:", value: region, inline: false },
+          { name: "Gamemode:", value: mode.toUpperCase(), inline: false },
+          { name: "Username:", value: username, inline: false },
+          { name: "Previous Tier:", value: prevTier, inline: false },
+          { name: "Tier Received:", value: tierName, inline: false }
+        ];
       }
 
       const embedPayload = {
