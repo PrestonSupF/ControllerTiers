@@ -110,7 +110,7 @@
 
             <div>
               <label class="block text-[10px] text-amber-400 font-bold uppercase mb-1">Select Tier Rank</label>
-              <select id="active-tier-select" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+              <select id="active-tier-select" onchange="checkTierSelection()" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
                 <option value="">-- No Tier / Unassigned --</option>
                 <option value="High S">High S</option>
                 <option value="Low S">Low S</option>
@@ -125,7 +125,25 @@
               </select>
             </div>
 
-            <button type="button" onclick="assignTierToPlayer()" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase px-3 py-2 w-full mt-1">
+            <div>
+              <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Previous Evaluation Tier</label>
+              <input type="text" id="active-prev-tier" placeholder="e.g. Low C or None" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+            </div>
+
+            <!-- DYNAMIC HIGH TEST FIGHT SCORES (Appears for High B and above) -->
+            <div id="high-test-scores-container" class="hidden space-y-2 p-2.5 bg-amber-950/20 border border-amber-500/40 rounded mt-2">
+              <span class="text-[10px] text-amber-400 font-black uppercase block"><i class="fa-solid fa-trophy"></i> High Test Scores Required (High B+)</span>
+              <div>
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 1 Score</label>
+                <input type="text" id="fight-1-score" placeholder="e.g. 3-1" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 2 Score</label>
+                <input type="text" id="fight-2-score" placeholder="e.g. 3-2" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+            </div>
+
+            <button type="button" onclick="assignTierToPlayer()" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase px-3 py-2 w-full mt-2">
               <i class="fa-solid fa-plus"></i> Set Mode Tier
             </button>
           </div>
@@ -168,8 +186,13 @@
 
   <script>
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
+    
+    // Webhook URLs
+    const LOW_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1563983888798318636/6dZ0Y5UAD3kAHKRfvEJH4ZZM8ogEBAp4d958UP8Qcl7PUmzNEE_kTW1hzHZmhQMBwVK5";
+    const HIGH_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1563983887997206669/no9_B-op6ic7PMLgKlxPqRljD_W0hHMMBeF6W_vGVpCrM4oMJ12bTm-u4pzNcG-ln0Pq";
+
     let playersMap = {};
-    let currentEditingTiers = {};
+    let currentEditingTiers = {}; // Stores { mode: { tier, prevTier, fight1, fight2 } }
 
     async function loadAdminData() {
       try {
@@ -197,7 +220,10 @@
         const p = playersMap[key];
         let tierSummary = '';
         if (p.tiers) {
-          tierSummary = Object.entries(p.tiers).map(([m, t]) => `<span class="bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-400 uppercase">${m}: ${t}</span>`).join(' ');
+          tierSummary = Object.entries(p.tiers).map(([m, data]) => {
+            const tierName = typeof data === 'object' ? data.tier : data;
+            return `<span class="bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-400 uppercase">${m}: ${tierName}</span>`;
+          }).join(' ');
         }
         return `
           <div class="brutalist-card p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60">
@@ -218,16 +244,54 @@
       }).join('');
     }
 
+    // Check if selected tier is High B or above to toggle Fight scores
+    function checkTierSelection() {
+      const tierVal = document.getElementById('active-tier-select').value;
+      const highScoresContainer = document.getElementById('high-test-scores-container');
+      
+      if (isHighTier(tierVal)) {
+        highScoresContainer.classList.remove('hidden');
+      } else {
+        highScoresContainer.classList.add('hidden');
+        document.getElementById('fight-1-score').value = '';
+        document.getElementById('fight-2-score').value = '';
+      }
+    }
+
+    function isHighTier(tierStr) {
+      if (!tierStr) return false;
+      const t = tierStr.toUpperCase();
+      // High B, High A, High S, or any S / A / B rank that is explicitly High
+      if (t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B')) {
+        return true;
+      }
+      return false;
+    }
+
     function assignTierToPlayer() {
       const mode = document.getElementById('active-mode-select').value;
       const tier = document.getElementById('active-tier-select').value;
+      const prevTier = document.getElementById('active-prev-tier').value.trim() || "None";
+      const fight1 = document.getElementById('fight-1-score').value.trim();
+      const fight2 = document.getElementById('fight-2-score').value.trim();
 
       if (!tier) {
         delete currentEditingTiers[mode];
       } else {
-        currentEditingTiers[mode] = tier;
+        currentEditingTiers[mode] = {
+          tier: tier,
+          prevTier: prevTier,
+          fight1: isHighTier(tier) ? fight1 : null,
+          fight2: isHighTier(tier) ? fight2 : null
+        };
       }
       renderAssignedPreview();
+      // Reset selectors
+      document.getElementById('active-tier-select').value = "";
+      document.getElementById('active-prev-tier').value = "";
+      document.getElementById('fight-1-score').value = "";
+      document.getElementById('fight-2-score').value = "";
+      document.getElementById('high-test-scores-container').classList.add('hidden');
     }
 
     function renderAssignedPreview() {
@@ -239,12 +303,15 @@
         return;
       }
 
-      container.innerHTML = entries.map(([mode, tier]) => `
-        <span class="bg-slate-950 border border-slate-700 px-2 py-1 rounded text-[10px] font-bold inline-flex items-center gap-1.5 text-white">
-          <span class="text-amber-400 uppercase">${mode}:</span> ${tier}
-          <button type="button" onclick="removeModeTier('${mode}')" class="text-rose-400 hover:text-rose-300 ml-1"><i class="fa-solid fa-xmark"></i></button>
-        </span>
-      `).join('');
+      container.innerHTML = entries.map(([mode, data]) => {
+        const tierName = typeof data === 'object' ? data.tier : data;
+        return `
+          <span class="bg-slate-950 border border-slate-700 px-2 py-1 rounded text-[10px] font-bold inline-flex items-center gap-1.5 text-white">
+            <span class="text-amber-400 uppercase">${mode}:</span> ${tierName}
+            <button type="button" onclick="removeModeTier('${mode}')" class="text-rose-400 hover:text-rose-300 ml-1"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `;
+      }).join('');
     }
 
     function removeModeTier(mode) {
@@ -269,7 +336,12 @@
         });
 
         if (res.ok) {
-          alert(`Successfully saved player: ${name}`);
+          // Send Webhooks for each newly assigned tier
+          for (const [mode, tierData] of Object.entries(currentEditingTiers)) {
+            await sendTestWebhooks(name, region, mode, tierData);
+          }
+          
+          alert(`Successfully saved player: ${name} and sent webhook notifications!`);
           resetForm();
           loadAdminData();
         } else {
@@ -281,6 +353,80 @@
       }
     }
 
+    // WEBHOOK ROUTING & FORMATTING
+    async function sendTestWebhooks(username, region, mode, tierData) {
+      const tierName = typeof tierData === 'object' ? tierData.tier : tierData;
+      const prevTier = typeof tierData === 'object' ? (tierData.prevTier || "None") : "None";
+      const isHigh = isHighTier(tierName);
+
+      let webhookPayload = {};
+      let targetWebhookUrl = "";
+
+      if (isHigh) {
+        targetWebhookUrl = HIGH_TEST_WEBHOOK_URL;
+        const score1 = tierData.fight1 || "N/A";
+        const score2 = tierData.fight2 || "N/A";
+
+        const markdownText = 
+`## High Test
+**Region:**
+${region}
+
+**Gamemode:**
+${mode.toUpperCase()}
+
+**Username:**
+${username}   
+
+**Previous Tier:**
+${prevTier}
+
+**Tier Received:**
+${tierName}
+
+**Fight 1**
+${score1}
+**Fight 2**
+${score2}`;
+
+        webhookPayload = { content: markdownText };
+
+      } else {
+        targetWebhookUrl = LOW_TEST_WEBHOOK_URL;
+
+        const markdownText = 
+`## Low Test
+**Region:**
+${region}
+
+**Gamemode:**
+${mode.toUpperCase()}
+
+**Username:**
+${username}   
+
+**Previous Tier:**
+${prevTier}
+
+**Tier Received:**
+${tierName}`;
+
+        webhookPayload = { content: markdownText };
+      }
+
+      if (!targetWebhookUrl || targetWebhookUrl.includes("YOUR_WEBHOOK")) return;
+
+      try {
+        await fetch(targetWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(webhookPayload)
+        });
+      } catch (err) {
+        console.error("Failed to transmit test webhook:", err);
+      }
+    }
+
     function editPlayer(key) {
       const p = playersMap[key];
       if (!p) return;
@@ -289,7 +435,7 @@
       document.getElementById('admin-region').value = p.region || 'NA';
       document.getElementById('admin-retired').checked = !!p.retired;
 
-      currentEditingTiers = p.tiers ? { ...p.tiers } : {};
+      currentEditingTiers = p.tiers ? JSON.parse(JSON.stringify(p.tiers)) : {};
       renderAssignedPreview();
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -316,6 +462,7 @@
     function resetForm() {
       document.getElementById('player-form').reset();
       currentEditingTiers = {};
+      document.getElementById('high-test-scores-container').classList.add('hidden');
       renderAssignedPreview();
     }
 
