@@ -49,14 +49,41 @@
     </nav>
   </header>
 
+  <!-- PLAYER PROFILE MODAL -->
+  <div id="player-profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+    <div class="brutalist-card bg-[#11161d] w-full max-w-lg p-6 relative border-emerald-400/80 shadow-[6px_6px_0px_#000]">
+      <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold text-sm bg-slate-900 border border-slate-700 px-2.5 py-1 uppercase"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="flex items-center gap-4 mb-3 -mt-2">
+        <div class="w-16 h-16 rounded-full border-2 border-emerald-400 bg-slate-950 overflow-hidden flex-shrink-0 shadow-[2px_2px_0px_#000]">
+          <img id="modal-avatar" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-cover">
+        </div>
+        <div class="overflow-hidden">
+          <h2 id="modal-player-name" class="text-xl font-black text-white normal-case truncate">---</h2>
+          <p class="text-xs font-bold text-emerald-400 uppercase tracking-wide">SubTiers Master</p>
+          <p id="modal-rank-pts" class="text-xs font-mono text-slate-300 font-bold mt-0.5">#0 Overall (0 Points)</p>
+          <p id="modal-region" class="text-[11px] font-mono text-slate-400">Region: North America</p>
+        </div>
+      </div>
+
+      <div class="border-b border-slate-800 my-3"></div>
+
+      <div id="modal-tiers-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[320px] overflow-y-auto pr-1"></div>
+
+      <div class="mt-4 text-center">
+        <span class="text-[10px] text-slate-500 italic">Tap or hover to see peak tiers</span>
+      </div>
+    </div>
+  </div>
+
   <!-- BEDROCK PODIUM -->
   <section class="brutalist-card p-4 sm:p-6 text-center mb-6">
-    <h2 class="text-xs font-black text-emerald-400 tracking-widest uppercase mb-1">Bedrock Edition Ranks</h2>
+    <h2 class="text-xs font-black text-emerald-400 tracking-widest uppercase mb-1">Bedrock Edition Ranks (1.5x Multiplier)</h2>
     <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">🧱 Bedrock Overall Podium 🧱</h3>
 
     <!-- TOP 3 PODIUM -->
     <div class="flex justify-center items-end gap-2 sm:gap-6 min-h-[220px]">
-      <div class="flex flex-col items-center w-24 sm:w-32">
+      <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(2)">
         <div class="h-28 sm:h-36 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
           <img id="podium-2-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain">
         </div>
@@ -65,7 +92,7 @@
         <span id="podium-2-pts" class="text-[10px] sm:text-xs text-slate-400 border border-slate-700 px-2 py-0.5 mt-1">0 PTS</span>
       </div>
 
-      <div class="flex flex-col items-center w-28 sm:w-36 -mt-6">
+      <div class="flex flex-col items-center w-28 sm:w-36 -mt-6 cursor-pointer" onclick="openPlayerModalFromRank(1)">
         <i class="fa-solid fa-crown text-emerald-400 text-xl mb-1 animate-bounce"></i>
         <div class="h-32 sm:h-40 w-28 sm:w-36 overflow-hidden relative mb-2 flex justify-center">
           <img id="podium-1-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain">
@@ -75,7 +102,7 @@
         <span id="podium-1-pts" class="text-xs text-emerald-400 border border-emerald-400/40 px-2 py-0.5 mt-1 font-bold">0 PTS</span>
       </div>
 
-      <div class="flex flex-col items-center w-24 sm:w-32">
+      <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(3)">
         <div class="h-24 sm:h-32 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
           <img id="podium-3-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="w-full h-full object-contain">
         </div>
@@ -88,7 +115,7 @@
     <!-- STACKED TOP 4 AND 5 -->
     <div class="mt-8 max-w-md mx-auto space-y-2">
       <!-- #4 Rank -->
-      <div class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80">
+      <div onclick="openPlayerModalFromRank(4)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-emerald-400 transition-colors">
         <div class="flex items-center gap-3">
           <span class="font-black text-emerald-400 text-sm w-6">#4</span>
           <img id="podium-4-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
@@ -98,7 +125,7 @@
       </div>
 
       <!-- #5 Rank -->
-      <div class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80">
+      <div onclick="openPlayerModalFromRank(5)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-emerald-400 transition-colors">
         <div class="flex items-center gap-3">
           <span class="font-black text-emerald-400 text-sm w-6">#5</span>
           <img id="podium-5-img" src="https://api.mcheads.org/avatar/2fach/right/192" class="h-9 w-9 object-contain border border-slate-700 bg-slate-950">
@@ -156,7 +183,7 @@
         <p>Played on Swimgg.club (Hive backup). First to 3 full match wins (same region) or First to 2 match wins on both regions.</p>
       </div>
       <div class="brutalist-card p-3">
-        <h3 class="font-bold text-white uppercase mb-1">Bridging</h3>
+        <h3 class="font-bold text-white uppercase mb-1">Bridging (0 Points)</h3>
         <p>Live tiertest host required. Max 3 minutes per bridge attempt. No modified clicking or boosted sensitivity.</p>
       </div>
     </div>
@@ -167,6 +194,7 @@
     const GITHUB_ICONS_BASE = "https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/";
 
     let appData = { players: [] };
+    let rankedPlayersCache = [];
     const bedrockModes = ['skywars', 'nodebuff', 'midfights', 'bridging'];
     const iconFilenameMap = { 'skywars': 'skywars.png', 'nodebuff': 'nodebuff.png', 'midfights': 'midfight.png', 'bridging': 'bridging.png' };
 
@@ -189,20 +217,25 @@
     function calculateBedrockPoints(player) {
       if (!player || !player.tiers || player.retired) return 0;
       const pointsMap = { 'HIGH S': 100, 'LOW S': 90, 'HIGH A': 80, 'LOW A': 70, 'HIGH B': 60, 'LOW B': 50, 'HIGH C': 40, 'LOW C': 30, 'HIGH D': 20, 'LOW D': 10 };
-      return Object.entries(player.tiers).reduce((sum, [mode, tierVal]) => {
-        if (bedrockModes.includes(mode.toLowerCase()) && tierVal) {
-          return sum + (pointsMap[String(tierVal).toUpperCase().trim()] || 0);
+      
+      let total = 0;
+      Object.entries(player.tiers).forEach(([mode, tierVal]) => {
+        const cleanMode = mode.toLowerCase().trim();
+        if (bedrockModes.includes(cleanMode) && tierVal) {
+          if (cleanMode === 'bridging') return; // 0 points for bridging
+          const basePts = pointsMap[String(tierVal).toUpperCase().trim()] || 0;
+          total += basePts * 1.5; // 1.5x multiplier for Bedrock
         }
-        return sum;
-      }, 0);
+      });
+      return Math.round(total);
     }
 
     function renderPodium() {
       const activePlayers = (appData.players || []).filter(p => !p.retired && calculateBedrockPoints(p) > 0);
-      const sorted = activePlayers.sort((a, b) => calculateBedrockPoints(b) - calculateBedrockPoints(a));
+      rankedPlayersCache = activePlayers.sort((a, b) => calculateBedrockPoints(b) - calculateBedrockPoints(a));
 
       [1, 2, 3, 4, 5].forEach((rank, index) => {
-        const player = sorted[index];
+        const player = rankedPlayersCache[index];
         const imgEl = document.getElementById(`podium-${rank}-img`);
         const nameEl = document.getElementById(`podium-${rank}-name`);
         const ptsEl = document.getElementById(`podium-${rank}-pts`);
@@ -217,6 +250,57 @@
           ptsEl.textContent = '0 PTS';
         }
       });
+    }
+
+    function openPlayerModalFromRank(rankNum) {
+      const player = rankedPlayersCache[rankNum - 1];
+      if (player) {
+        openPlayerProfileModal(player, rankNum);
+      }
+    }
+
+    function openPlayerProfileModal(player, exactRank = null) {
+      if (!player) return;
+      document.getElementById('modal-avatar').src = `https://api.mcheads.org/avatar/.${player.name}/right/192`;
+      document.getElementById('modal-player-name').textContent = player.name;
+      
+      let rankNum = exactRank;
+      if (!rankNum) {
+        const sorted = [...appData.players].filter(p => !p.retired && calculateBedrockPoints(p) > 0).sort((a, b) => calculateBedrockPoints(b) - calculateBedrockPoints(a));
+        const idx = sorted.findIndex(p => p.name.toLowerCase() === player.name.toLowerCase());
+        rankNum = idx !== -1 ? idx + 1 : '-';
+      }
+
+      const totalPts = calculateBedrockPoints(player);
+      document.getElementById('modal-rank-pts').textContent = `#${rankNum} Overall (${totalPts} Points)`;
+      document.getElementById('modal-region').textContent = `Region: ${player.region || 'North America'}`;
+
+      const gridContainer = document.getElementById('modal-tiers-grid');
+      gridContainer.innerHTML = '';
+
+      if (player.tiers && Object.keys(player.tiers).length > 0) {
+        Object.entries(player.tiers).forEach(([mode, tier]) => {
+          if (!tier) return;
+          const iconUrl = getModeIconUrl(mode);
+          gridContainer.innerHTML += `
+            <div class="flex items-center justify-between bg-slate-900 border border-slate-700/80 p-2 rounded">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <img src="${iconUrl}" class="w-5 h-5 object-contain flex-shrink-0" onerror="this.src='https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/skywars.png'">
+                <span class="text-xs font-bold text-white uppercase truncate">${mode}</span>
+              </div>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider">${tier}</span>
+            </div>
+          `;
+        });
+      } else {
+        gridContainer.innerHTML = `<p class="text-xs text-slate-500 italic p-2 col-span-2">No assigned tiers</p>`;
+      }
+
+      document.getElementById('player-profile-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('player-profile-modal').classList.add('hidden');
     }
 
     function renderTierlist() {
@@ -250,7 +334,7 @@
           });
 
           let playerCards = matchingPlayers.map(p => `
-            <div class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44">
+            <div onclick="openPlayerProfileModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44 cursor-pointer hover:border-emerald-400 transition-colors">
               <img src="https://api.mcheads.org/avatar/.${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain">
               <div class="overflow-hidden">
                 <div class="font-bold text-xs truncate text-white normal-case">${p.name}</div>
