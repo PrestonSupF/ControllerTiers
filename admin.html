@@ -72,50 +72,58 @@
           </select>
         </div>
 
-        <!-- Tier Inputs Grid -->
+        <!-- Mode & Tier Dropdown Selector Section -->
         <div class="space-y-3 pt-2 border-t border-slate-800">
-          <h3 class="text-xs font-black uppercase text-slate-400">Mode Tiers (e.g., High S, Low A)</h3>
+          <h3 class="text-xs font-black uppercase text-slate-400">Assign Mode Tiers</h3>
           
-          <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="space-y-2">
             <div>
-              <label class="text-[10px] text-sky-400 font-bold uppercase">Sword</label>
-              <input type="text" data-mode="sword" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+              <label class="block text-[10px] text-sky-400 font-bold uppercase mb-1">Select Game Mode</label>
+              <select id="active-mode-select" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+                <optgroup label="☕ Java Modes">
+                  <option value="sword">Sword</option>
+                  <option value="smp">SMP</option>
+                  <option value="crystal">Crystal</option>
+                  <option value="mace">Mace</option>
+                  <option value="uhc">UHC</option>
+                  <option value="pot">Pot</option>
+                </optgroup>
+                <optgroup label="🧱 Bedrock Modes">
+                  <option value="skywars">Skywars</option>
+                  <option value="nodebuff">Nodebuff</option>
+                  <option value="midfights">Midfights</option>
+                  <option value="bridging">Bridging</option>
+                </optgroup>
+              </select>
             </div>
+
             <div>
-              <label class="text-[10px] text-sky-400 font-bold uppercase">SMP</label>
-              <input type="text" data-mode="smp" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+              <label class="block text-[10px] text-amber-400 font-bold uppercase mb-1">Select Tier Rank</label>
+              <select id="active-tier-select" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+                <option value="">-- No Tier / Unassigned --</option>
+                <option value="High S">High S</option>
+                <option value="Low S">Low S</option>
+                <option value="High A">High A</option>
+                <option value="Low A">Low A</option>
+                <option value="High B">High B</option>
+                <option value="Low B">Low B</option>
+                <option value="High C">High C</option>
+                <option value="Low C">Low C</option>
+                <option value="High D">High D</option>
+                <option value="Low D">Low D</option>
+              </select>
             </div>
-            <div>
-              <label class="text-[10px] text-sky-400 font-bold uppercase">Crystal</label>
-              <input type="text" data-mode="crystal" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
-            </div>
-            <div>
-              <label class="text-[10px] text-sky-400 font-bold uppercase">Mace</label>
-              <input type="text" data-mode="mace" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
-            </div>
-            <div>
-              <label class="text-[10px] text-sky-400 font-bold uppercase">UHC</label>
-              <input type="text" data-mode="uhc" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
-            </div>
-            <div>
-              <label class="text-[10px] text-sky-400 font-bold uppercase">Pot</label>
-              <input type="text" data-mode="pot" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
-            </div>
-            <div>
-              <label class="text-[10px] text-emerald-400 font-bold uppercase">Skywars</label>
-              <input type="text" data-mode="skywars" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
-            </div>
-            <div>
-              <label class="text-[10px] text-emerald-400 font-bold uppercase">Nodebuff</label>
-              <input type="text" data-mode="nodebuff" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
-            </div>
-            <div>
-              <label class="text-[10px] text-emerald-400 font-bold uppercase">Midfights</label>
-              <input type="text" data-mode="midfights" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
-            </div>
-            <div>
-              <label class="text-[10px] text-emerald-400 font-bold uppercase">Bridging</label>
-              <input type="text" data-mode="bridging" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+
+            <button type="button" onclick="assignTierToPlayer()" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase px-3 py-2 w-full mt-1">
+              <i class="fa-solid fa-plus"></i> Set Mode Tier
+            </button>
+          </div>
+
+          <!-- Active Assigned Tiers Preview List -->
+          <div class="mt-3">
+            <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Current Assigned Tiers:</label>
+            <div id="assigned-tiers-preview" class="flex flex-wrap gap-1.5 p-2 bg-slate-900/80 border border-slate-800 min-h-[44px]">
+              <span class="text-[10px] text-slate-500 italic">No modes assigned yet</span>
             </div>
           </div>
         </div>
@@ -127,7 +135,7 @@
         </div>
 
         <div class="flex gap-2 pt-3">
-          <button type="submit" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase px-4 py-2.5 w-full">Save Player</button>
+          <button type="submit" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase px-4 py-2.5 w-full">Save Player to DB</button>
           <button type="button" onclick="resetForm()" class="brutalist-btn bg-slate-800 text-slate-300 font-bold text-xs uppercase px-3 py-2.5">Reset</button>
         </div>
       </form>
@@ -150,6 +158,7 @@
   <script>
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
     let playersMap = {};
+    let currentEditingTiers = {};
 
     async function loadAdminData() {
       try {
@@ -175,16 +184,21 @@
 
       container.innerHTML = keys.map(key => {
         const p = playersMap[key];
+        let tierSummary = '';
+        if (p.tiers) {
+          tierSummary = Object.entries(p.tiers).map(([m, t]) => `<span class="bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-400 uppercase">${m}: ${t}</span>`).join(' ');
+        }
         return `
-          <div class="brutalist-card p-3 flex items-center justify-between bg-slate-900/60">
+          <div class="brutalist-card p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60">
             <div class="flex items-center gap-3">
               <img src="https://api.mcheads.org/avatar/${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain" onerror="this.src='https://api.mcheads.org/avatar/2fach/right/192'">
               <div>
                 <h4 class="font-black text-sm text-white normal-case">${p.name} ${p.retired ? '<span class="text-[10px] text-amber-500 font-normal">(RETIRED)</span>' : ''}</h4>
                 <p class="text-[10px] text-slate-400 font-mono">Region: ${p.region || 'NA'}</p>
+                <div class="flex flex-wrap gap-1 mt-1">${tierSummary || '<span class="text-[10px] text-slate-500 italic">No tiers</span>'}</div>
               </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 self-end sm:self-center">
               <button onclick="editPlayer('${key}')" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white px-3 py-1 text-xs font-bold uppercase">Edit</button>
               <button onclick="deletePlayer('${key}')" class="brutalist-btn bg-rose-600 hover:bg-rose-500 text-white px-3 py-1 text-xs font-bold uppercase">Delete</button>
             </div>
@@ -193,21 +207,47 @@
       }).join('');
     }
 
+    function assignTierToPlayer() {
+      const mode = document.getElementById('active-mode-select').value;
+      const tier = document.getElementById('active-tier-select').value;
+
+      if (!tier) {
+        delete currentEditingTiers[mode];
+      } else {
+        currentEditingTiers[mode] = tier;
+      }
+      renderAssignedPreview();
+    }
+
+    function renderAssignedPreview() {
+      const container = document.getElementById('assigned-tiers-preview');
+      const entries = Object.entries(currentEditingTiers);
+
+      if (entries.length === 0) {
+        container.innerHTML = `<span class="text-[10px] text-slate-500 italic">No modes assigned yet</span>`;
+        return;
+      }
+
+      container.innerHTML = entries.map(([mode, tier]) => `
+        <span class="bg-slate-950 border border-slate-700 px-2 py-1 rounded text-[10px] font-bold inline-flex items-center gap-1.5 text-white">
+          <span class="text-amber-400 uppercase">${mode}:</span> ${tier}
+          <button type="button" onclick="removeModeTier('${mode}')" class="text-rose-400 hover:text-rose-300 ml-1"><i class="fa-solid fa-xmark"></i></button>
+        </span>
+      `).join('');
+    }
+
+    function removeModeTier(mode) {
+      delete currentEditingTiers[mode];
+      renderAssignedPreview();
+    }
+
     async function savePlayer(event) {
       event.preventDefault();
       const name = document.getElementById('admin-name').value.trim();
       const region = document.getElementById('admin-region').value;
       const retired = document.getElementById('admin-retired').checked;
 
-      const tiers = {};
-      document.querySelectorAll('.tier-input').forEach(input => {
-        const val = input.value.trim();
-        if (val) {
-          tiers[input.dataset.mode] = val;
-        }
-      });
-
-      const playerObj = { name, region, retired, tiers };
+      const playerObj = { name, region, retired, tiers: currentEditingTiers };
       const firebaseKey = name.toLowerCase();
 
       try {
@@ -238,10 +278,8 @@
       document.getElementById('admin-region').value = p.region || 'NA';
       document.getElementById('admin-retired').checked = !!p.retired;
 
-      document.querySelectorAll('.tier-input').forEach(input => {
-        const mode = input.dataset.mode;
-        input.value = p.tiers && p.tiers[mode] ? p.tiers[mode] : '';
-      });
+      currentEditingTiers = p.tiers ? { ...p.tiers } : {};
+      renderAssignedPreview();
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -266,6 +304,8 @@
 
     function resetForm() {
       document.getElementById('player-form').reset();
+      currentEditingTiers = {};
+      renderAssignedPreview();
     }
 
     function filterRoster() {
