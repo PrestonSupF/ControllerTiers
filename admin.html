@@ -3,225 +3,281 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controller PvP | Admin Panel</title>
+  <title>Controller PvP | Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background-color: #090b0e; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .brutalist-card { background: #11161d; border: 2px solid #1e293b; box-shadow: 4px 4px 0px #000; }
-    .brutalist-btn { background: #1e293b; border: 2px solid #334155; box-shadow: 3px 3px 0px #000; transition: all 0.1s ease; }
-    .brutalist-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0px #000; }
-    .brutalist-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
+    body {
+      background-color: #090b0e;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .brutalist-card {
+      background: #11161d;
+      border: 2px solid #1e293b;
+      box-shadow: 4px 4px 0px #000;
+    }
+    .brutalist-btn {
+      background: #1e293b;
+      border: 2px solid #334155;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.1s ease;
+    }
+    .brutalist-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #000;
+    }
   </style>
 </head>
-<body class="min-h-screen p-4 max-w-4xl mx-auto flex flex-col gap-6">
+<body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
 
-  <!-- PASSWORD MODAL OVERLAY -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="brutalist-card p-6 w-full max-w-md space-y-4 text-center">
-      <h2 class="text-xl font-black uppercase text-amber-400">🔒 Admin Authentication</h2>
-      <p class="text-xs text-slate-400">Please enter the administrator password to manage the tierlist.</p>
-      <input type="password" id="admin-pass-input" placeholder="Enter password..." class="bg-slate-900 border border-slate-700 p-2.5 text-xs text-center font-bold uppercase w-full text-white">
-      <button onclick="authenticateAdmin()" class="brutalist-btn w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase text-xs">
-        Login to Panel
-      </button>
-      <p id="auth-error" class="text-xs text-red-400 font-bold hidden">Incorrect password!</p>
+  <!-- TOP HEADER -->
+  <header class="brutalist-card p-3 mb-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png" 
+           alt="Controller Logo" 
+           class="h-10 w-10 object-contain"
+           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/2fach/right/192';">
+      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP - Admin Dashboard</h1>
     </div>
-  </div>
 
-  <!-- MAIN ADMIN CONTENT -->
-  <div id="admin-content" class="hidden flex flex-col gap-6">
+    <nav class="flex items-center gap-2">
+      <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Home</a>
+      <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-400">☕ Java</a>
+      <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">🧱 Bedrock</a>
+    </nav>
+  </header>
 
-    <header class="brutalist-card p-4 flex justify-between items-center">
-      <h1 class="text-xl font-black uppercase text-amber-400">🔧 Controller PvP Admin Panel</h1>
-      <div class="flex items-center gap-2">
-        <a href="index.html" class="brutalist-btn text-xs font-bold px-3 py-1.5 uppercase">View Site</a>
-        <button onclick="logoutAdmin()" class="brutalist-btn text-xs font-bold px-3 py-1.5 uppercase bg-red-900/60 hover:bg-red-800 text-red-200 border-red-700">Logout</button>
-      </div>
-    </header>
+  <!-- ADMIN MANAGEMENT CONTAINER -->
+  <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- PLAYER MANAGEMENT -->
-    <section class="brutalist-card p-5 space-y-4">
-      <h2 class="text-sm font-black uppercase text-slate-400">Player Management</h2>
+    <!-- ADD / EDIT PLAYER FORM -->
+    <section class="brutalist-card p-4 sm:p-6 lg:col-span-1 h-fit">
+      <h2 id="form-heading" class="text-lg font-black uppercase text-amber-400 mb-4 border-b border-slate-800 pb-2">Add / Edit Player</h2>
       
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <form id="player-form" onsubmit="savePlayer(event)" class="space-y-4">
         <div>
-          <label class="text-xs font-bold text-slate-300">Player Username</label>
-          <input type="text" id="player-name" placeholder="e.g. Tynza" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Minecraft Username</label>
+          <input type="text" id="admin-name" required placeholder="e.g. Tynza" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
         </div>
-        <div>
-          <label class="text-xs font-bold text-slate-300">Platform</label>
-          <select id="player-platform" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
-            <option value="java">Java Edition</option>
-            <option value="bedrock">Bedrock Edition</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-300">Region</label>
-          <select id="player-region" class="bg-slate-900 border border-slate-700 p-2 text-xs font-bold uppercase w-full mt-1">
-            <option value="NA">NA (North America)</option>
-            <option value="EU">EU (Europe)</option>
-            <option value="AS">AS (Asia)</option>
-            <option value="SA">SA (South America)</option>
-            <option value="OCE">OCE (Oceania)</option>
-          </select>
-        </div>
-      </div>
 
-      <!-- TIER ASSIGNMENTS -->
-      <div class="space-y-4">
         <div>
-          <h3 class="text-xs font-black uppercase text-sky-400 mb-2 border-b border-slate-800 pb-1">☕ Java Gamemodes</h3>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-            <div><label class="font-bold text-slate-400 block mb-1">Sword</label><select id="tier-sword" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">SMP</label><select id="tier-smp" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">Crystal</label><select id="tier-crystal" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">Mace</label><select id="tier-mace" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">UHC</label><select id="tier-uhc" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">Pot</label><select id="tier-pot" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Region</label>
+          <select id="admin-region" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white uppercase font-bold focus:outline-none">
+            <option value="NA">NA</option>
+            <option value="EU">EU</option>
+            <option value="AS">AS</option>
+            <option value="SA">SA</option>
+            <option value="OCE">OCE</option>
+          </select>
+        </div>
+
+        <!-- Tier Inputs Grid -->
+        <div class="space-y-3 pt-2 border-t border-slate-800">
+          <h3 class="text-xs font-black uppercase text-slate-400">Mode Tiers (e.g., High S, Low A)</h3>
+          
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-[10px] text-sky-400 font-bold uppercase">Sword</label>
+              <input type="text" data-mode="sword" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-sky-400 font-bold uppercase">SMP</label>
+              <input type="text" data-mode="smp" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-sky-400 font-bold uppercase">Crystal</label>
+              <input type="text" data-mode="crystal" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-sky-400 font-bold uppercase">Mace</label>
+              <input type="text" data-mode="mace" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-sky-400 font-bold uppercase">UHC</label>
+              <input type="text" data-mode="uhc" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-sky-400 font-bold uppercase">Pot</label>
+              <input type="text" data-mode="pot" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-emerald-400 font-bold uppercase">Skywars</label>
+              <input type="text" data-mode="skywars" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-emerald-400 font-bold uppercase">Nodebuff</label>
+              <input type="text" data-mode="nodebuff" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-emerald-400 font-bold uppercase">Midfights</label>
+              <input type="text" data-mode="midfights" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
+            <div>
+              <label class="text-[10px] text-emerald-400 font-bold uppercase">Bridging</label>
+              <input type="text" data-mode="bridging" class="tier-input w-full bg-slate-900 border border-slate-700 p-1.5 text-white uppercase">
+            </div>
           </div>
         </div>
 
-        <div>
-          <h3 class="text-xs font-black uppercase text-emerald-400 mb-2 border-b border-slate-800 pb-1">🧱 Bedrock Gamemodes</h3>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div><label class="font-bold text-slate-400 block mb-1">Skywars</label><select id="tier-skywars" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">Nodebuff</label><select id="tier-nodebuff" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">Midfights</label><select id="tier-midfights" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-            <div><label class="font-bold text-slate-400 block mb-1">Bridging</label><select id="tier-bridging" class="bg-slate-900 border border-slate-700 p-1.5 text-xs w-full"><option value="">None</option><option value="High S">High S</option><option value="Low S">Low S</option><option value="High A">High A</option><option value="Low A">Low A</option><option value="High B">High B</option><option value="Low B">Low B</option><option value="High C">High C</option><option value="Low C">Low C</option><option value="High D">High D</option><option value="Low D">Low D</option></select></div>
-          </div>
+        <div class="pt-2">
+          <label class="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer">
+            <input type="checkbox" id="admin-retired" class="w-4 h-4 accent-amber-400"> Retired Player
+          </label>
         </div>
+
+        <div class="flex gap-2 pt-3">
+          <button type="submit" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase px-4 py-2.5 w-full">Save Player</button>
+          <button type="button" onclick="resetForm()" class="brutalist-btn bg-slate-800 text-slate-300 font-bold text-xs uppercase px-3 py-2.5">Reset</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- PLAYER LIST DATABASE MANAGEMENT -->
+    <section class="brutalist-card p-4 sm:p-6 lg:col-span-2">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
+        <h2 class="text-lg font-black uppercase text-amber-400">Registered Roster</h2>
+        <input type="text" id="roster-search" onkeyup="filterRoster()" placeholder="Filter roster..." class="bg-slate-900 border border-slate-700 px-3 py-1 text-xs text-white focus:outline-none">
       </div>
 
-      <!-- ACTION BUTTONS -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-        <button onclick="savePlayerToFirebase()" id="save-btn" class="brutalist-btn py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-xs tracking-wider">
-          💾 Save / Update Player
-        </button>
-        <button onclick="retirePlayerInFirebase()" id="retire-btn" class="brutalist-btn py-3 bg-amber-600 hover:bg-amber-500 text-white font-black uppercase text-xs tracking-wider">
-          🌙 Retire Player
-        </button>
-        <button onclick="removePlayerFromFirebase()" id="remove-btn" class="brutalist-btn py-3 bg-red-600 hover:bg-red-800 text-white font-black uppercase text-xs tracking-wider">
-          🗑️ Remove Player
-        </button>
+      <div id="roster-list" class="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+        <p class="text-xs text-slate-500 italic">Loading players from database...</p>
       </div>
     </section>
 
-  </div>
+  </main>
 
   <script>
-    const ADMIN_PASS = "control";
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
+    let playersMap = {};
 
-    if (sessionStorage.getItem('admin_authenticated') === 'true') {
-      showAdminContent();
-    }
-
-    document.getElementById('admin-pass-input').addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') authenticateAdmin();
-    });
-
-    function authenticateAdmin() {
-      const input = document.getElementById('admin-pass-input').value;
-      if (input === ADMIN_PASS) {
-        sessionStorage.setItem('admin_authenticated', 'true');
-        showAdminContent();
-      } else {
-        document.getElementById('auth-error').classList.remove('hidden');
-      }
-    }
-
-    function showAdminContent() {
-      document.getElementById('auth-modal').classList.add('hidden');
-      document.getElementById('admin-content').classList.remove('hidden');
-    }
-
-    function logoutAdmin() {
-      sessionStorage.removeItem('admin_authenticated');
-      location.reload();
-    }
-
-    async function savePlayerToFirebase() {
-      const name = document.getElementById('player-name').value.trim();
-      const platform = document.getElementById('player-platform').value;
-      const region = document.getElementById('player-region').value;
-
-      if (!name) { alert('Please enter a player username!'); return; }
-
-      const btn = document.getElementById('save-btn');
-      btn.textContent = '⏳ Syncing...';
-      btn.disabled = true;
-
-      const playerObj = {
-        name: name,
-        platform: platform,
-        region: region,
-        retired: false,
-        tiers: {
-          sword: document.getElementById('tier-sword').value,
-          smp: document.getElementById('tier-smp').value,
-          crystal: document.getElementById('tier-crystal').value,
-          mace: document.getElementById('tier-mace').value,
-          uhc: document.getElementById('tier-uhc').value,
-          pot: document.getElementById('tier-pot').value,
-          skywars: document.getElementById('tier-skywars').value,
-          nodebuff: document.getElementById('tier-nodebuff').value,
-          midfights: document.getElementById('tier-midfights').value,
-          bridging: document.getElementById('tier-bridging').value
+    async function loadAdminData() {
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}players.json`);
+        if (res.ok) {
+          const data = await res.json();
+          playersMap = data || {};
         }
-      };
+      } catch (e) {
+        console.warn('Failed to load database:', e);
+      }
+      renderRoster();
+    }
+
+    function renderRoster() {
+      const container = document.getElementById('roster-list');
+      const keys = Object.keys(playersMap);
+
+      if (keys.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic">No players registered in database yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = keys.map(key => {
+        const p = playersMap[key];
+        return `
+          <div class="brutalist-card p-3 flex items-center justify-between bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <img src="https://api.mcheads.org/avatar/${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain" onerror="this.src='https://api.mcheads.org/avatar/2fach/right/192'">
+              <div>
+                <h4 class="font-black text-sm text-white normal-case">${p.name} ${p.retired ? '<span class="text-[10px] text-amber-500 font-normal">(RETIRED)</span>' : ''}</h4>
+                <p class="text-[10px] text-slate-400 font-mono">Region: ${p.region || 'NA'}</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="editPlayer('${key}')" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white px-3 py-1 text-xs font-bold uppercase">Edit</button>
+              <button onclick="deletePlayer('${key}')" class="brutalist-btn bg-rose-600 hover:bg-rose-500 text-white px-3 py-1 text-xs font-bold uppercase">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function savePlayer(event) {
+      event.preventDefault();
+      const name = document.getElementById('admin-name').value.trim();
+      const region = document.getElementById('admin-region').value;
+      const retired = document.getElementById('admin-retired').checked;
+
+      const tiers = {};
+      document.querySelectorAll('.tier-input').forEach(input => {
+        const val = input.value.trim();
+        if (val) {
+          tiers[input.dataset.mode] = val;
+        }
+      });
+
+      const playerObj = { name, region, retired, tiers };
+      const firebaseKey = name.toLowerCase();
 
       try {
-        const res = await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, {
+        const res = await fetch(`${FIREBASE_DB_URL}players/${firebaseKey}.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(playerObj)
         });
 
         if (res.ok) {
-          alert(`SUCCESS! "${name}" saved to database!`);
+          alert(`Successfully saved player: ${name}`);
+          resetForm();
+          loadAdminData();
         } else {
-          alert('Firebase Error saving player.');
+          alert('Error saving player to database.');
         }
-      } catch (err) {
-        alert(`Exception: ${err.message}`);
-      } finally {
-        btn.textContent = '💾 Save / Update Player';
-        btn.disabled = false;
+      } catch (e) {
+        console.error(e);
+        alert('Network error while saving player.');
       }
     }
 
-    async function retirePlayerInFirebase() {
-      const name = document.getElementById('player-name').value.trim();
-      if (!name) { alert('Please enter a player username to retire!'); return; }
-      if (!confirm(`Mark "${name}" as RETIRED?`)) return;
+    function editPlayer(key) {
+      const p = playersMap[key];
+      if (!p) return;
 
-      const playerObj = {
-        name: name,
-        platform: document.getElementById('player-platform').value,
-        region: document.getElementById('player-region').value,
-        retired: true,
-        tiers: {
-          sword: "", smp: "", crystal: "", mace: "", uhc: "", pot: "",
-          skywars: "", nodebuff: "", midfights: "", bridging: ""
-        }
-      };
+      document.getElementById('admin-name').value = p.name;
+      document.getElementById('admin-region').value = p.region || 'NA';
+      document.getElementById('admin-retired').checked = !!p.retired;
 
-      await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(playerObj)
+      document.querySelectorAll('.tier-input').forEach(input => {
+        const mode = input.dataset.mode;
+        input.value = p.tiers && p.tiers[mode] ? p.tiers[mode] : '';
       });
-      alert(`"${name}" is now retired.`);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    async function removePlayerFromFirebase() {
-      const name = document.getElementById('player-name').value.trim();
-      if (!name) { alert('Please enter a player username to remove!'); return; }
-      if (!confirm(`PERMANENTLY REMOVE "${name}"?`)) return;
+    async function deletePlayer(key) {
+      if (!confirm(`Are you sure you want to delete ${key} from the database?`)) return;
 
-      await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, { method: 'DELETE' });
-      alert(`"${name}" has been removed.`);
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}players/${key}.json`, {
+          method: 'DELETE'
+        });
+
+        if (res.ok) {
+          loadAdminData();
+        } else {
+          alert('Failed to delete player.');
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
+
+    function resetForm() {
+      document.getElementById('player-form').reset();
+    }
+
+    function filterRoster() {
+      const query = document.getElementById('roster-search').value.toLowerCase();
+      const cards = document.querySelectorAll('#roster-list > div');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(query) ? 'flex' : 'none';
+      });
+    }
+
+    loadAdminData();
   </script>
 </body>
 </html>
