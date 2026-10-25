@@ -258,10 +258,13 @@
       }
     }
 
+    // High Tier = High B, Low A, High A, Low S, High S
+    // Low B is explicitly excluded and treated as a Low Test
     function isHighTier(tierStr) {
       if (!tierStr) return false;
-      const t = tierStr.toUpperCase();
-      // High B, High A, High S, or any S / A / B rank that is explicitly High
+      const t = tierStr.toUpperCase().trim();
+      if (t === 'LOW B') return false; 
+      
       if (t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B')) {
         return true;
       }
