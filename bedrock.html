@@ -11,7 +11,7 @@
   <!-- Open Graph / Discord & Social Embed Metadata -->
   <meta property="og:title" content="Controller PvP | Bedrock Tierlist">
   <meta property="og:description" content="View competitive Bedrock Minecraft controller rankings across Skywars, Nodebuff, Midfights, and Bridging gamemodes.">
-  <meta property="og:url" content="https://controller-tierlist.vercel.app/bedrock.html">
+  <meta property="og:url" content="https://psfpvp.xyz/bedrock.html">
   <meta property="og:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
   <meta property="og:type" content="website">
 
@@ -98,7 +98,6 @@
     <h2 class="text-xs font-black text-emerald-400 tracking-widest uppercase mb-1">Bedrock Edition Ranks (1.5x Multiplier)</h2>
     <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-8">🧱 Bedrock Overall Podium 🧱</h3>
 
-    <!-- TOP 3 PODIUM -->
     <div class="flex justify-center items-end gap-2 sm:gap-6 min-h-[220px]">
       <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(2)">
         <div class="h-28 sm:h-36 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
@@ -129,9 +128,7 @@
       </div>
     </div>
 
-    <!-- STACKED TOP 4 AND 5 -->
     <div class="mt-8 max-w-md mx-auto space-y-2">
-      <!-- #4 Rank -->
       <div onclick="openPlayerModalFromRank(4)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-emerald-400 transition-colors">
         <div class="flex items-center gap-3">
           <span class="font-black text-emerald-400 text-sm w-6">#4</span>
@@ -141,7 +138,6 @@
         <span id="podium-4-pts" class="text-xs font-mono text-slate-400 border border-slate-700 px-2 py-0.5">0 PTS</span>
       </div>
 
-      <!-- #5 Rank -->
       <div onclick="openPlayerModalFromRank(5)" class="brutalist-card p-2 flex items-center justify-between bg-slate-900/80 cursor-pointer hover:border-emerald-400 transition-colors">
         <div class="flex items-center gap-3">
           <span class="font-black text-emerald-400 text-sm w-6">#5</span>
@@ -219,6 +215,11 @@
       return GITHUB_ICONS_BASE + (iconFilenameMap[mode.toLowerCase()] || 'skywars.png');
     }
 
+    function getTierString(tierData) {
+      if (!tierData) return "";
+      return (typeof tierData === 'object' ? tierData.tier : tierData) || "";
+    }
+
     async function loadData() {
       try {
         const res = await fetch(`${FIREBASE_DB_URL}players.json`);
@@ -236,12 +237,13 @@
       const pointsMap = { 'HIGH S': 100, 'LOW S': 90, 'HIGH A': 80, 'LOW A': 70, 'HIGH B': 60, 'LOW B': 50, 'HIGH C': 40, 'LOW C': 30, 'HIGH D': 20, 'LOW D': 10 };
       
       let total = 0;
-      Object.entries(player.tiers).forEach(([mode, tierVal]) => {
+      Object.entries(player.tiers).forEach(([mode, rawVal]) => {
         const cleanMode = mode.toLowerCase().trim();
-        if (bedrockModes.includes(cleanMode) && tierVal) {
-          if (cleanMode === 'bridging') return; // 0 points for bridging
-          const basePts = pointsMap[String(tierVal).toUpperCase().trim()] || 0;
-          total += basePts * 1.5; // 1.5x multiplier for Bedrock
+        if (bedrockModes.includes(cleanMode)) {
+          if (cleanMode === 'bridging') return; 
+          const tierStr = getTierString(rawVal).toUpperCase().trim();
+          const basePts = pointsMap[tierStr] || 0;
+          total += basePts * 1.5; 
         }
       });
       return Math.round(total);
@@ -271,9 +273,7 @@
 
     function openPlayerModalFromRank(rankNum) {
       const player = rankedPlayersCache[rankNum - 1];
-      if (player) {
-        openPlayerProfileModal(player, rankNum);
-      }
+      if (player) openPlayerProfileModal(player, rankNum);
     }
 
     function openPlayerProfileModal(player, exactRank = null) {
@@ -296,7 +296,8 @@
       gridContainer.innerHTML = '';
 
       if (player.tiers && Object.keys(player.tiers).length > 0) {
-        Object.entries(player.tiers).forEach(([mode, tier]) => {
+        Object.entries(player.tiers).forEach(([mode, rawVal]) => {
+          const tier = getTierString(rawVal);
           if (!tier) return;
           const iconUrl = getModeIconUrl(mode);
           gridContainer.innerHTML += `
@@ -344,7 +345,7 @@
           const matchingPlayers = (appData.players || []).filter(p => {
             if (!p.tiers || p.retired) return false;
             const modeKey = Object.keys(p.tiers).find(k => k.toLowerCase().trim() === selectedMode);
-            const playerTierVal = modeKey ? String(p.tiers[modeKey]).trim().toLowerCase() : '';
+            const playerTierVal = modeKey ? getTierString(p.tiers[modeKey]).trim().toLowerCase() : '';
             const matchesMode = playerTierVal === sub.toLowerCase();
             const matchesRegion = selectedRegion === 'ALL' || (p.region || 'NA').toUpperCase() === selectedRegion;
             return matchesMode && matchesRegion;
