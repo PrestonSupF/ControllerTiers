@@ -185,6 +185,27 @@
         </div>
       </div>
     </section>
+
+    <!-- GENERAL RULES & COMMUNITY -->
+    <div class="brutalist-card p-6">
+      <h2 class="text-xl font-black uppercase mb-4 border-b border-slate-800 pb-2 text-amber-400"><i class="fa-solid fa-gavel"></i> General Rules</h2>
+      <ul class="text-xs sm:text-sm space-y-2 text-slate-300 list-disc pl-5 mb-6">
+        <li>The fights must be watched and scored by an official tier tester.</li>
+        <li>No cheat clients, proxies, or anything that modifies gameplay directly for an unfair advantage.</li>
+        <li>No boosted sensitivity with any method on Bedrock. Modified deadzones and curves are allowed.</li>
+        <li>You are allowed to remap buttons (like back buttons), but you cannot hit or place with 2 buttons, or use macro configurations to execute multiple inputs simultaneously.</li>
+        <li>If hackusated and a comp hoster agrees to host a screenshare/practical/handcam, you must comply or your fight will be invalidated.</li>
+        <li>Double clicking is not allowed. Use DC prevent in fights or use a controller that doesn't double click.</li>
+        <li>If score ties across regions, the 2 players will share the leaderboard spot.</li>
+        <li>Do not intentionally continue attacking if the opponent is clearly lagging or AFK.</li>
+      </ul>
+
+      <div class="flex justify-center">
+        <a href="https://discord.gg/5dNTzEe8x" target="_blank" class="brutalist-btn bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-6 py-3 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-brands fa-discord text-lg"></i> Join Controller Discord
+        </a>
+      </div>
+    </div>
   </main>
 
   <script>
@@ -194,7 +215,18 @@
     let appData = { players: [] };
     let rankedPlayersCache = [];
 
+    const iconFilenameMap = {
+      'sword': 'sword.png', 'smp': 'smp.png', 'crystal': 'crystal.png',
+      'mace': 'mace.png', 'uhc': 'uhc.png', 'pot': 'pot.png',
+      'skywars': 'skywars.png', 'nodebuff': 'nodebuff.png',
+      'midfights': 'midfight.png', 'bridging': 'bridging.png'
+    };
+
     const bedrockModesList = ['skywars', 'nodebuff', 'midfights', 'bridging'];
+
+    function getModeIconUrl(mode) {
+      return GITHUB_ICONS_BASE + (iconFilenameMap[mode.toLowerCase()] || 'sword.png');
+    }
 
     function getTierString(tierData) {
       if (!tierData) return "";
@@ -280,12 +312,16 @@
         Object.entries(player.tiers).forEach(([mode, data]) => {
           if (typeof data === 'object' && isHighTier(data.tier)) {
             logsFound++;
+            const iconUrl = getModeIconUrl(mode);
             container.innerHTML += `
               <div class="brutalist-card p-3 bg-slate-900/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-amber-500/30">
                 <div class="flex items-center gap-3">
                   <img src="${getRenderUrl(player)}" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain">
                   <div>
-                    <h4 class="font-black text-sm text-white">${player.name} <span class="text-amber-400 text-xs">(${mode.toUpperCase()})</span></h4>
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                      <img src="${iconUrl}" class="w-4 h-4 object-contain" onerror="this.style.display='none'">
+                      <h4 class="font-black text-sm text-white">${player.name} <span class="text-amber-400 text-xs">(${mode.toUpperCase()})</span></h4>
+                    </div>
                     <p class="text-[11px] font-bold text-sky-400">Tier Earned: ${data.tier} <span class="text-slate-400 font-normal">(Prev: ${data.prevTier || 'Unranked'})</span></p>
                   </div>
                 </div>
@@ -338,9 +374,13 @@
         Object.entries(player.tiers).forEach(([mode, rawVal]) => {
           const tier = getTierString(rawVal);
           if (!tier) return;
+          const iconUrl = getModeIconUrl(mode);
           gridContainer.innerHTML += `
             <div class="flex items-center justify-between bg-slate-900 border border-slate-700/80 p-2 rounded">
-              <span class="text-xs font-bold text-white uppercase truncate">${mode}</span>
+              <div class="flex items-center gap-2 overflow-hidden">
+                <img src="${iconUrl}" class="w-5 h-5 object-contain flex-shrink-0" onerror="this.src='https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/sword.png'">
+                <span class="text-xs font-bold text-white uppercase truncate">${mode}</span>
+              </div>
               <span class="bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider">${tier}</span>
             </div>
           `;
