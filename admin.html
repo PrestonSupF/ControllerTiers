@@ -8,13 +8,6 @@
   <!-- Favicon / Tab Icon -->
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
 
-  <!-- Open Graph / Discord & Social Embed Metadata -->
-  <meta property="og:title" content="Controller PvP | Admin Panel">
-  <meta property="og:description" content="Admin management panel for updating ranks and tier submissions.">
-  <meta property="og:url" content="https://controller-tierlist.vercel.app/admin.html">
-  <meta property="og:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
-  <meta property="og:type" content="website">
-
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -78,7 +71,7 @@
     </div>
   </div>
 
-  <!-- ADMIN MANAGEMENT CONTAINER (Hidden until authenticated) -->
+  <!-- ADMIN MANAGEMENT CONTAINER -->
   <main id="admin-panel-container" class="hidden grid-cols-1 lg:grid-cols-3 gap-6">
 
     <!-- ADD / EDIT PLAYER FORM -->
@@ -161,7 +154,13 @@
               </select>
             </div>
 
-            <!-- DYNAMIC HIGH TEST FIGHT SCORES & TESTER INPUTS -->
+            <!-- DYNAMIC LOW TEST SCORE INPUT (Low B and below) -->
+            <div id="low-test-score-container" class="space-y-1 p-2 bg-slate-900 border border-slate-800 rounded mt-2">
+              <label class="block text-[9px] text-slate-300 uppercase font-bold">Fight Score (Low Test)</label>
+              <input type="text" id="low-fight-score" placeholder="e.g. 3-0" class="w-full bg-slate-950 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+            </div>
+
+            <!-- DYNAMIC HIGH TEST SCORES & TESTERS (High B+) -->
             <div id="high-test-scores-container" class="hidden space-y-2.5 p-2.5 bg-amber-950/20 border border-amber-500/40 rounded mt-2">
               <span class="text-[10px] text-amber-400 font-black uppercase block"><i class="fa-solid fa-trophy"></i> High Test Scores Required (High B+)</span>
               
@@ -227,7 +226,7 @@
 
   <script>
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
-    const ADMIN_PASSCODE = "control";
+    const ADMIN_PASSCODE = "controller123";
     
     // Webhook URLs
     const LOW_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1563983888798318636/6dZ0Y5UAD3kAHKRfvEJH4ZZM8ogEBAp4d958UP8Qcl7PUmzNEE_kTW1hzHZmhQMBwVK5";
@@ -279,9 +278,7 @@
           const data = await res.json();
           playersMap = data || {};
         }
-      } catch (e) {
-        console.warn('Failed to load database:', e);
-      }
+      } catch (e) { console.warn('Failed to load database:', e); }
       renderRoster();
     }
 
@@ -325,9 +322,11 @@
     function checkTierSelection() {
       const tierVal = document.getElementById('active-tier-select').value;
       const highScoresContainer = document.getElementById('high-test-scores-container');
+      const lowScoreContainer = document.getElementById('low-test-score-container');
       
       if (isHighTier(tierVal)) {
         highScoresContainer.classList.remove('hidden');
+        lowScoreContainer.classList.add('hidden');
         if (!document.getElementById('fight-1-tester').value) {
           document.getElementById('fight-1-tester').value = currentTesterUsername;
         }
@@ -336,6 +335,7 @@
         }
       } else {
         highScoresContainer.classList.add('hidden');
+        lowScoreContainer.classList.remove('hidden');
         document.getElementById('fight-1-tester').value = '';
         document.getElementById('fight-1-score').value = '';
         document.getElementById('fight-2-tester').value = '';
@@ -347,17 +347,14 @@
       if (!tierStr) return false;
       const t = tierStr.toUpperCase().trim();
       if (t === 'LOW B') return false; 
-      
-      if (t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B')) {
-        return true;
-      }
-      return false;
+      return t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B');
     }
 
     function assignTierToPlayer() {
       const mode = document.getElementById('active-mode-select').value;
       const tier = document.getElementById('active-tier-select').value;
       const prevTier = document.getElementById('active-prev-tier').value;
+      const lowScore = document.getElementById('low-fight-score').value.trim();
       const fight1Tester = document.getElementById('fight-1-tester').value.trim() || currentTesterUsername;
       const fight1Score = document.getElementById('fight-1-score').value.trim();
       const fight2Tester = document.getElementById('fight-2-tester').value.trim() || currentTesterUsername;
@@ -370,6 +367,7 @@
           tier: tier,
           prevTier: prevTier,
           tester: currentTesterUsername,
+          score: !isHighTier(tier) ? lowScore : null,
           fight1Tester: isHighTier(tier) ? fight1Tester : null,
           fight1: isHighTier(tier) ? fight1Score : null,
           fight2Tester: isHighTier(tier) ? fight2Tester : null,
@@ -379,11 +377,13 @@
       renderAssignedPreview();
       document.getElementById('active-tier-select').value = "";
       document.getElementById('active-prev-tier').value = "Unranked";
+      document.getElementById('low-fight-score').value = "";
       document.getElementById('fight-1-tester').value = "";
       document.getElementById('fight-1-score').value = "";
       document.getElementById('fight-2-tester').value = "";
       document.getElementById('fight-2-score').value = "";
       document.getElementById('high-test-scores-container').classList.add('hidden');
+      document.getElementById('low-test-score-container').classList.remove('hidden');
     }
 
     function renderAssignedPreview() {
@@ -431,20 +431,16 @@
           for (const [mode, tierData] of Object.entries(currentEditingTiers)) {
             await sendTestWebhooks(name, region, mode, tierData);
           }
-          
           alert(`Successfully saved player: ${name} and sent webhook notifications!`);
           resetForm();
           loadAdminData();
         } else {
           alert('Error saving player to database.');
         }
-      } catch (e) {
-        console.error(e);
-        alert('Network error while saving player.');
-      }
+      } catch (e) { console.error(e); }
     }
 
-    // DISCORD EMBED WEBHOOK ROUTING WITH TESTER FIELDS
+    // DISCORD EMBED WEBHOOK ROUTING WITH LOW SCORE INCLUDED
     async function sendTestWebhooks(username, region, mode, tierData) {
       const tierName = typeof tierData === 'object' ? tierData.tier : tierData;
       const prevTier = typeof tierData === 'object' ? (tierData.prevTier || "Unranked") : "Unranked";
@@ -458,7 +454,6 @@
       let fieldsArray = [];
 
       if (isHigh) {
-        // High Test Embed (No top Tester field, only individual fight testers below)
         const f1Tester = tierData.fight1Tester || testerIGN;
         const f2Tester = tierData.fight2Tester || testerIGN;
 
@@ -472,14 +467,14 @@
           { name: `Fight 2 (Tester: ${f2Tester})`, value: tierData.fight2 || "N/A", inline: false }
         ];
       } else {
-        // Low Test Embed (Includes top Tester field)
         fieldsArray = [
           { name: "Tester:", value: testerIGN, inline: false },
           { name: "Region:", value: region, inline: false },
           { name: "Gamemode:", value: mode.toUpperCase(), inline: false },
           { name: "Username:", value: username, inline: false },
           { name: "Previous Tier:", value: prevTier, inline: false },
-          { name: "Tier Received:", value: tierName, inline: false }
+          { name: "Tier Received:", value: tierName, inline: false },
+          { name: "Score:", value: tierData.score || "N/A", inline: false }
         ];
       }
 
@@ -493,7 +488,7 @@
         }]
       };
 
-      if (!targetWebhookUrl || targetWebhookUrl.includes("YOUR_WEBHOOK")) return;
+      if (!targetWebhookUrl) return;
 
       try {
         await fetch(targetWebhookUrl, {
@@ -501,9 +496,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(embedPayload)
         });
-      } catch (err) {
-        console.error("Failed to transmit embed webhook:", err);
-      }
+      } catch (err) { console.error("Webhook error:", err); }
     }
 
     function editPlayer(key) {
@@ -524,24 +517,16 @@
       if (!confirm(`Are you sure you want to delete ${key} from the database?`)) return;
 
       try {
-        const res = await fetch(`${FIREBASE_DB_URL}players/${key}.json`, {
-          method: 'DELETE'
-        });
-
-        if (res.ok) {
-          loadAdminData();
-        } else {
-          alert('Failed to delete player.');
-        }
-      } catch (e) {
-        console.error(e);
-      }
+        const res = await fetch(`${FIREBASE_DB_URL}players/${key}.json`, { method: 'DELETE' });
+        if (res.ok) loadAdminData();
+      } catch (e) { console.error(e); }
     }
 
     function resetForm() {
       document.getElementById('player-form').reset();
       currentEditingTiers = {};
       document.getElementById('high-test-scores-container').classList.add('hidden');
+      document.getElementById('low-test-score-container').classList.remove('hidden');
       renderAssignedPreview();
     }
 
