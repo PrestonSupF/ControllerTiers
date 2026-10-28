@@ -8,18 +8,12 @@
   <!-- Favicon / Tab Icon -->
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
 
-  <!-- Open Graph / Discord & Social Embed Metadata -->
+  <!-- Open Graph / Social Metadata -->
   <meta property="og:title" content="Controller PvP | Leaderboards & Tiers">
   <meta property="og:description" content="The official competitive Minecraft controller PvP tracking platform for Java and Bedrock. View rankings, overall podiums, and player stats.">
   <meta property="og:url" content="https://psfpvp.xyz/">
   <meta property="og:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
   <meta property="og:type" content="website">
-
-  <!-- Twitter Card Metadata -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Controller PvP | Leaderboards & Tiers">
-  <meta name="twitter:description" content="The official competitive Minecraft controller PvP tracking platform for Java and Bedrock.">
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -62,6 +56,9 @@
       <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-amber-500 text-black">Home</a>
       <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-400">☕ Java</a>
       <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">🧱 Bedrock</a>
+      <button onclick="openFightLogsModal()" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-400 border-amber-500/50">
+        <i class="fa-solid fa-scroll mr-1"></i> Fight Logs
+      </button>
     </nav>
   </header>
 
@@ -82,6 +79,27 @@
     </div>
   </section>
 
+  <!-- HIGH TIER FIGHT LOGS MODAL -->
+  <div id="fight-logs-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+    <div class="brutalist-card bg-[#11161d] w-full max-w-2xl p-6 relative border-amber-400/80 shadow-[6px_6px_0px_#000]">
+      <button onclick="closeFightLogsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold text-sm bg-slate-900 border border-slate-700 px-2.5 py-1 uppercase"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <i class="fa-solid fa-trophy text-amber-400 text-2xl"></i>
+        <div>
+          <h2 class="text-xl font-black text-white uppercase tracking-wider">High Tier Fight Logs</h2>
+          <p class="text-xs text-slate-400">Recorded match evaluations for High B Tier and above</p>
+        </div>
+      </div>
+
+      <div class="border-b border-slate-800 mb-4"></div>
+
+      <div id="fight-logs-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+        <p class="text-xs text-slate-500 italic p-2 text-center">Loading fight logs...</p>
+      </div>
+    </div>
+  </div>
+
   <!-- PLAYER PROFILE MODAL -->
   <div id="player-profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
     <div class="brutalist-card bg-[#11161d] w-full max-w-lg p-6 relative border-amber-400/80 shadow-[6px_6px_0px_#000]">
@@ -100,12 +118,7 @@
       </div>
 
       <div class="border-b border-slate-800 my-3"></div>
-
       <div id="modal-tiers-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[320px] overflow-y-auto pr-1"></div>
-
-      <div class="mt-4 text-center">
-        <span class="text-[10px] text-slate-500 italic">Tap or hover to see peak tiers</span>
-      </div>
     </div>
   </div>
 
@@ -122,7 +135,7 @@
         <!-- #2 Rank -->
         <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(2)">
           <div class="h-28 sm:h-36 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-2-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="2nd Place">
+            <img id="podium-2-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
           </div>
           <div class="w-full bg-slate-300 text-slate-900 font-black py-2 border-2 border-slate-400 shadow-[2px_2px_0px_#000]">2</div>
           <span id="podium-2-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full normal-case">---</span>
@@ -133,7 +146,7 @@
         <div class="flex flex-col items-center w-28 sm:w-36 -mt-6 cursor-pointer" onclick="openPlayerModalFromRank(1)">
           <i class="fa-solid fa-crown text-amber-400 text-xl mb-1 animate-bounce"></i>
           <div class="h-32 sm:h-40 w-28 sm:w-36 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-1-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]" alt="1st Place">
+            <img id="podium-1-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
           </div>
           <div class="w-full bg-amber-400 text-black font-black py-3 border-2 border-amber-300 shadow-[3px_3px_0px_#000] text-lg">1</div>
           <span id="podium-1-name" class="font-bold text-sm sm:text-base mt-2 truncate w-full text-amber-400 normal-case">---</span>
@@ -143,7 +156,7 @@
         <!-- #3 Rank -->
         <div class="flex flex-col items-center w-24 sm:w-32 cursor-pointer" onclick="openPlayerModalFromRank(3)">
           <div class="h-24 sm:h-32 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
-            <img id="podium-3-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]" alt="3rd Place">
+            <img id="podium-3-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
           </div>
           <div class="w-full bg-amber-700 text-amber-100 font-black py-1.5 border-2 border-amber-600 shadow-[2px_2px_0px_#000]">3</div>
           <span id="podium-3-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full normal-case">---</span>
@@ -172,27 +185,6 @@
         </div>
       </div>
     </section>
-
-    <!-- GENERAL RULES & COMMUNITY -->
-    <div class="brutalist-card p-6">
-      <h2 class="text-xl font-black uppercase mb-4 border-b border-slate-800 pb-2 text-amber-400"><i class="fa-solid fa-gavel"></i> General Rules</h2>
-      <ul class="text-xs sm:text-sm space-y-2 text-slate-300 list-disc pl-5 mb-6">
-        <li>The fights must be watched and scored by an official tier tester.</li>
-        <li>No cheat clients, proxies, or anything that modifies gameplay directly for an unfair advantage.</li>
-        <li>No boosted sensitivity with any method on Bedrock. Modified deadzones and curves are allowed.</li>
-        <li>You are allowed to remap buttons (like back buttons), but you cannot hit or place with 2 buttons, or use macro configurations to execute multiple inputs simultaneously.</li>
-        <li>If hackusated and a comp hoster agrees to host a screenshare/practical/handcam, you must comply or your fight will be invalidated.</li>
-        <li>Double clicking is not allowed. Use DC prevent in fights or use a controller that doesn't double click.</li>
-        <li>If score ties across regions, the 2 players will share the leaderboard spot.</li>
-        <li>Do not intentionally continue attacking if the opponent is clearly lagging or AFK.</li>
-      </ul>
-
-      <div class="flex justify-center">
-        <a href="https://discord.gg/5dNTzEe8x" target="_blank" class="brutalist-btn bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-6 py-3 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-brands fa-discord text-lg"></i> Join Controller Discord
-        </a>
-      </div>
-    </div>
   </main>
 
   <script>
@@ -202,22 +194,18 @@
     let appData = { players: [] };
     let rankedPlayersCache = [];
 
-    const iconFilenameMap = {
-      'sword': 'sword.png', 'smp': 'smp.png', 'crystal': 'crystal.png',
-      'mace': 'mace.png', 'uhc': 'uhc.png', 'pot': 'pot.png',
-      'skywars': 'skywars.png', 'nodebuff': 'nodebuff.png',
-      'midfights': 'midfight.png', 'bridging': 'bridging.png'
-    };
-
     const bedrockModesList = ['skywars', 'nodebuff', 'midfights', 'bridging'];
-
-    function getModeIconUrl(mode) {
-      return GITHUB_ICONS_BASE + (iconFilenameMap[mode.toLowerCase()] || 'sword.png');
-    }
 
     function getTierString(tierData) {
       if (!tierData) return "";
       return (typeof tierData === 'object' ? tierData.tier : tierData) || "";
+    }
+
+    function isHighTier(tierStr) {
+      if (!tierStr) return false;
+      const t = tierStr.toUpperCase().trim();
+      if (t === 'LOW B') return false; 
+      return t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B');
     }
 
     async function loadData() {
@@ -281,6 +269,47 @@
       });
     }
 
+    function openFightLogsModal() {
+      const container = document.getElementById('fight-logs-container');
+      container.innerHTML = '';
+
+      let logsFound = 0;
+
+      (appData.players || []).forEach(player => {
+        if (!player.tiers) return;
+        Object.entries(player.tiers).forEach(([mode, data]) => {
+          if (typeof data === 'object' && isHighTier(data.tier)) {
+            logsFound++;
+            container.innerHTML += `
+              <div class="brutalist-card p-3 bg-slate-900/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-amber-500/30">
+                <div class="flex items-center gap-3">
+                  <img src="${getRenderUrl(player)}" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain">
+                  <div>
+                    <h4 class="font-black text-sm text-white">${player.name} <span class="text-amber-400 text-xs">(${mode.toUpperCase()})</span></h4>
+                    <p class="text-[11px] font-bold text-sky-400">Tier Earned: ${data.tier} <span class="text-slate-400 font-normal">(Prev: ${data.prevTier || 'Unranked'})</span></p>
+                  </div>
+                </div>
+                <div class="text-right text-[11px] font-mono bg-slate-950 p-2 border border-slate-800 rounded w-full sm:w-auto">
+                  <div><span class="text-amber-400">Fight 1:</span> ${data.fight1 || 'N/A'} <span class="text-slate-500">(${data.fight1Tester || 'Tester'})</span></div>
+                  <div><span class="text-amber-400">Fight 2:</span> ${data.fight2 || 'N/A'} <span class="text-slate-500">(${data.fight2Tester || 'Tester'})</span></div>
+                </div>
+              </div>
+            `;
+          }
+        });
+      });
+
+      if (logsFound === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No high tier fight logs recorded yet.</p>`;
+      }
+
+      document.getElementById('fight-logs-modal').classList.remove('hidden');
+    }
+
+    function closeFightLogsModal() {
+      document.getElementById('fight-logs-modal').classList.add('hidden');
+    }
+
     function openPlayerModalFromRank(rankNum) {
       const player = rankedPlayersCache[rankNum - 1];
       if (player) openPlayerProfileModal(player, rankNum);
@@ -309,13 +338,9 @@
         Object.entries(player.tiers).forEach(([mode, rawVal]) => {
           const tier = getTierString(rawVal);
           if (!tier) return;
-          const iconUrl = getModeIconUrl(mode);
           gridContainer.innerHTML += `
             <div class="flex items-center justify-between bg-slate-900 border border-slate-700/80 p-2 rounded">
-              <div class="flex items-center gap-2 overflow-hidden">
-                <img src="${iconUrl}" class="w-5 h-5 object-contain flex-shrink-0" onerror="this.src='https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/sword.png'">
-                <span class="text-xs font-bold text-white uppercase truncate">${mode}</span>
-              </div>
+              <span class="text-xs font-bold text-white uppercase truncate">${mode}</span>
               <span class="bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider">${tier}</span>
             </div>
           `;
