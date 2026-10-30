@@ -111,7 +111,7 @@
                   <option value="uhc">UHC</option>
                   <option value="pot">Pot</option>
                 </optgroup>
-                <optgroup label="🧱 Bedrock Modes">
+                <optgroup label="MB Bedrock Modes">
                   <option value="skywars">Skywars</option>
                   <option value="nodebuff">Nodebuff</option>
                   <option value="midfights">Midfights</option>
@@ -154,13 +154,13 @@
               </select>
             </div>
 
-            <!-- DYNAMIC LOW TEST SCORE INPUT (Low B and below) -->
+            <!-- DYNAMIC LOW TEST SCORE INPUT -->
             <div id="low-test-score-container" class="space-y-1 p-2 bg-slate-900 border border-slate-800 rounded mt-2">
               <label class="block text-[9px] text-slate-300 uppercase font-bold">Fight Score (Low Test)</label>
               <input type="text" id="low-fight-score" placeholder="e.g. 3-0" class="w-full bg-slate-950 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
             </div>
 
-            <!-- DYNAMIC HIGH TEST SCORES & TESTERS (High B+) -->
+            <!-- DYNAMIC HIGH TEST SCORES, TESTERS & YOUTUBE URL -->
             <div id="high-test-scores-container" class="hidden space-y-2.5 p-2.5 bg-amber-950/20 border border-amber-500/40 rounded mt-2">
               <span class="text-[10px] text-amber-400 font-black uppercase block"><i class="fa-solid fa-trophy"></i> High Test Scores Required (High B+)</span>
               
@@ -180,6 +180,12 @@
               <div>
                 <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 2 Score</label>
                 <input type="text" id="fight-2-score" placeholder="e.g. 3-2" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+
+              <!-- OPTIONAL YOUTUBE LINK -->
+              <div class="pt-1 border-t border-amber-500/20">
+                <label class="block text-[9px] text-red-400 uppercase font-bold mb-0.5"><i class="fa-brands fa-youtube"></i> YouTube Match Link (Optional)</label>
+                <input type="url" id="youtube-match-link" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
               </div>
             </div>
 
@@ -340,6 +346,7 @@
         document.getElementById('fight-1-score').value = '';
         document.getElementById('fight-2-tester').value = '';
         document.getElementById('fight-2-score').value = '';
+        document.getElementById('youtube-match-link').value = '';
       }
     }
 
@@ -348,6 +355,19 @@
       const t = tierStr.toUpperCase().trim();
       if (t === 'LOW B') return false; 
       return t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B');
+    }
+
+    // Convert standard YouTube link into embeddable format
+    function parseYouTubeEmbedUrl(url) {
+      if (!url) return null;
+      let videoId = "";
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      if (match && match[2].length === 11) {
+        videoId = match[2];
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+      return url;
     }
 
     function assignTierToPlayer() {
@@ -359,6 +379,7 @@
       const fight1Score = document.getElementById('fight-1-score').value.trim();
       const fight2Tester = document.getElementById('fight-2-tester').value.trim() || currentTesterUsername;
       const fight2Score = document.getElementById('fight-2-score').value.trim();
+      const rawYtUrl = document.getElementById('youtube-match-link').value.trim();
 
       if (!tier) {
         delete currentEditingTiers[mode];
@@ -371,7 +392,8 @@
           fight1Tester: isHighTier(tier) ? fight1Tester : null,
           fight1: isHighTier(tier) ? fight1Score : null,
           fight2Tester: isHighTier(tier) ? fight2Tester : null,
-          fight2: isHighTier(tier) ? fight2Score : null
+          fight2: isHighTier(tier) ? fight2Score : null,
+          youtubeUrl: isHighTier(tier) ? parseYouTubeEmbedUrl(rawYtUrl) : null
         };
       }
       renderAssignedPreview();
@@ -382,6 +404,7 @@
       document.getElementById('fight-1-score').value = "";
       document.getElementById('fight-2-tester').value = "";
       document.getElementById('fight-2-score').value = "";
+      document.getElementById('youtube-match-link').value = "";
       document.getElementById('high-test-scores-container').classList.add('hidden');
       document.getElementById('low-test-score-container').classList.remove('hidden');
     }
@@ -440,7 +463,7 @@
       } catch (e) { console.error(e); }
     }
 
-    // DISCORD EMBED WEBHOOK ROUTING WITH LOW SCORE INCLUDED
+    // DISCORD EMBED WEBHOOK ROUTING WITH OPTIONAL YOUTUBE FIELD
     async function sendTestWebhooks(username, region, mode, tierData) {
       const tierName = typeof tierData === 'object' ? tierData.tier : tierData;
       const prevTier = typeof tierData === 'object' ? (tierData.prevTier || "Unranked") : "Unranked";
@@ -466,6 +489,10 @@
           { name: `Fight 1 (Tester: ${f1Tester})`, value: tierData.fight1 || "N/A", inline: false },
           { name: `Fight 2 (Tester: ${f2Tester})`, value: tierData.fight2 || "N/A", inline: false }
         ];
+
+        if (tierData.youtubeUrl) {
+          fieldsArray.push({ name: "🎬 Match Video:", value: `[Watch on YouTube](${tierData.youtubeUrl})`, inline: false });
+        }
       } else {
         fieldsArray = [
           { name: "Tester:", value: testerIGN, inline: false },
