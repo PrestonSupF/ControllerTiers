@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controller PvP | Home</title>
+
+  <!-- Favicon / Tab Icon -->
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
+
+  <!-- Open Graph / Social Metadata -->
+  <meta property="og:title" content="Controller PvP | Leaderboards & Tiers">
+  <meta property="og:description" content="The official competitive Minecraft controller PvP tracking platform for Java and Bedrock.">
+  <meta property="og:url" content="https://psfpvp.xyz/">
+  <meta property="og:image" content="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
+  <meta property="og:type" content="website">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #090b0e;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .brutalist-card {
+      background: #11161d;
+      border: 2px solid #1e293b;
+      box-shadow: 4px 4px 0px #000;
+    }
+    .brutalist-btn {
+      background: #1e293b;
+      border: 2px solid #334155;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.1s ease;
+    }
+    .brutalist-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #000;
+    }
+    .podium-gold { background-color: #FFD700; color: #000; border-color: #E6C200; }
+    .podium-silver { background-color: #C0C0C0; color: #000; border-color: #A8A8A8; }
+    .podium-bronze { background-color: #CD7F32; color: #fff; border-color: #B06F28; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
+
+  <!-- TOP HEADER -->
+  <header class="brutalist-card p-3 mb-4 flex items-center justify-between flex-wrap gap-2">
+    <div class="flex items-center gap-3">
+      <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png" 
+           alt="Controller Logo" 
+           class="h-10 w-10 object-contain"
+           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/LostInMotion/right/192';">
+      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP</h1>
+    </div>
+
+    <nav class="flex items-center gap-2 flex-wrap">
+      <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-amber-500 text-black">Home</a>
+      <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-400">☕ Java</a>
+      <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">🧱 Bedrock</a>
+      <a href="bridge.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-300">🌉 Bridge</a>
+      <button onclick="openFightLogsModal()" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-400 border-amber-500/50">
+        <i class="fa-solid fa-scroll mr-1"></i> Fight Logs
+      </button>
+    </nav>
+  </header>
+
+  <!-- PLAYER SEARCH BAR -->
+  <section class="brutalist-card p-3 mb-6 relative">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-magnifying-glass text-slate-400 pl-2"></i>
+      <input type="text" id="player-search-input" onkeyup="searchPlayer()" placeholder="Search player to view all tiers..." class="bg-transparent text-xs sm:text-sm font-bold tracking-wider text-white w-full focus:outline-none p-1">
+    </div>
+
+    <!-- SEARCH RESULTS DROPDOWN -->
+    <div id="search-modal" class="hidden absolute top-14 left-0 right-0 z-50 brutalist-card p-4 bg-slate-950/95 backdrop-blur border-amber-400">
+      <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+        <h3 id="search-card-title" class="font-black text-amber-400 uppercase text-sm">Player Search Results</h3>
+        <button onclick="closeSearchModal()" class="text-xs font-bold text-slate-400 hover:text-white uppercase"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+      <div id="search-card-body" class="space-y-3"></div>
+    </div>
+  </section>
+
+  <!-- FIGHT LOGS MODAL -->
+  <div id="fight-logs-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+    <div class="brutalist-card bg-[#11161d] w-full max-w-2xl p-6 relative border-amber-400/80 shadow-[6px_6px_0px_#000]">
+      <button onclick="closeFightLogsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold text-sm bg-slate-900 border border-slate-700 px-2.5 py-1 uppercase"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <i class="fa-solid fa-trophy text-amber-400 text-2xl"></i>
+        <div>
+          <h2 class="text-xl font-black text-white uppercase tracking-wider">Evaluation Fight Logs</h2>
+          <p class="text-xs text-slate-400">Recorded match evaluations & video replays</p>
+        </div>
+      </div>
+
+      <div class="border-b border-slate-800 mb-4"></div>
+
+      <div id="fight-logs-container" class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
+        <p class="text-xs text-slate-500 italic p-2 text-center">Loading fight logs...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAYER PROFILE MODAL WITH SPLIT POINTS -->
+  <div id="player-profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+    <div class="brutalist-card bg-[#11161d] w-full max-w-lg p-6 relative border-amber-400/80 shadow-[6px_6px_0px_#000]">
+      <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold text-sm bg-slate-900 border border-slate-700 px-2.5 py-1 uppercase"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="flex items-center gap-4 mb-3 -mt-2">
+        <div class="w-16 h-16 rounded-full border-2 border-amber-400 bg-slate-950 overflow-hidden flex-shrink-0 shadow-[2px_2px_0px_#000]">
+          <img id="modal-avatar" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-cover">
+        </div>
+        <div class="overflow-hidden">
+          <h2 id="modal-player-name" class="text-xl font-black text-white normal-case truncate">---</h2>
+          <p class="text-xs font-bold text-amber-400 uppercase tracking-wide">Category Points Breakdown</p>
+          <div id="modal-rank-pts" class="text-[11px] font-mono text-slate-300 font-bold mt-1 space-x-2"></div>
+          <p id="modal-region" class="text-[11px] font-mono text-slate-400 mt-1">Region: North America</p>
+        </div>
+      </div>
+
+      <div class="border-b border-slate-800 my-3"></div>
+      <div id="modal-tiers-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[320px] overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <!-- MAIN HOME VIEW -->
+  <main class="space-y-6">
+
+    <!-- SIDE-BY-SIDE SEPARATE PODIUMS (JAVA & BEDROCK) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- JAVA PODIUM -->
+      <section class="brutalist-card p-4 sm:p-6 text-center">
+        <h2 class="text-xs font-black text-sky-400 tracking-widest uppercase mb-1">Java Edition Standings</h2>
+        <h3 class="text-xl sm:text-2xl font-black uppercase tracking-tight mb-6 text-sky-300">☕ Java Top 3 Podium</h3>
+
+        <div class="flex justify-center items-end gap-2 min-h-[190px]">
+          <div class="flex flex-col items-center w-20 sm:w-28 cursor-pointer" onclick="openPlayerModalFromRank('java', 2)">
+            <div class="h-24 w-20 sm:w-28 overflow-hidden relative mb-2 flex justify-center">
+              <img id="java-podium-2-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+            </div>
+            <div class="w-full podium-silver font-black py-1.5 border-2 shadow-[2px_2px_0px_#000] text-xs">2</div>
+            <span id="java-podium-2-name" class="font-bold text-xs mt-2 truncate w-full normal-case">---</span>
+            <span id="java-podium-2-pts" class="text-[10px] text-slate-400 border border-slate-700 px-1 py-0.5 mt-1">0 PTS</span>
+          </div>
+
+          <div class="flex flex-col items-center w-24 sm:w-32 -mt-4 cursor-pointer" onclick="openPlayerModalFromRank('java', 1)">
+            <i class="fa-solid fa-crown text-amber-400 text-lg mb-1 animate-bounce"></i>
+            <div class="h-28 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
+              <img id="java-podium-1-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+            </div>
+            <div class="w-full podium-gold font-black py-2.5 border-2 shadow-[3px_3px_0px_#000] text-base">1</div>
+            <span id="java-podium-1-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full text-amber-300 normal-case">---</span>
+            <span id="java-podium-1-pts" class="text-[10px] text-amber-300 border border-amber-400/40 px-1.5 py-0.5 mt-1 font-bold">0 PTS</span>
+          </div>
+
+          <div class="flex flex-col items-center w-20 sm:w-28 cursor-pointer" onclick="openPlayerModalFromRank('java', 3)">
+            <div class="h-20 w-20 sm:w-28 overflow-hidden relative mb-2 flex justify-center">
+              <img id="java-podium-3-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+            </div>
+            <div class="w-full podium-bronze font-black py-1 border-2 shadow-[2px_2px_0px_#000] text-xs">3</div>
+            <span id="java-podium-3-name" class="font-bold text-xs mt-2 truncate w-full normal-case">---</span>
+            <span id="java-podium-3-pts" class="text-[10px] text-slate-400 border border-slate-700 px-1 py-0.5 mt-1">0 PTS</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- BEDROCK PODIUM -->
+      <section class="brutalist-card p-4 sm:p-6 text-center">
+        <h2 class="text-xs font-black text-emerald-400 tracking-widest uppercase mb-1">Bedrock Edition Standings</h2>
+        <h3 class="text-xl sm:text-2xl font-black uppercase tracking-tight mb-6 text-emerald-300">🧱 Bedrock Top 3 Podium</h3>
+
+        <div class="flex justify-center items-end gap-2 min-h-[190px]">
+          <div class="flex flex-col items-center w-20 sm:w-28 cursor-pointer" onclick="openPlayerModalFromRank('bedrock', 2)">
+            <div class="h-24 w-20 sm:w-28 overflow-hidden relative mb-2 flex justify-center">
+              <img id="bedrock-podium-2-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+            </div>
+            <div class="w-full podium-silver font-black py-1.5 border-2 shadow-[2px_2px_0px_#000] text-xs">2</div>
+            <span id="bedrock-podium-2-name" class="font-bold text-xs mt-2 truncate w-full normal-case">---</span>
+            <span id="bedrock-podium-2-pts" class="text-[10px] text-slate-400 border border-slate-700 px-1 py-0.5 mt-1">0 PTS</span>
+          </div>
+
+          <div class="flex flex-col items-center w-24 sm:w-32 -mt-4 cursor-pointer" onclick="openPlayerModalFromRank('bedrock', 1)">
+            <i class="fa-solid fa-crown text-amber-400 text-lg mb-1 animate-bounce"></i>
+            <div class="h-28 w-24 sm:w-32 overflow-hidden relative mb-2 flex justify-center">
+              <img id="bedrock-podium-1-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+            </div>
+            <div class="w-full podium-gold font-black py-2.5 border-2 shadow-[3px_3px_0px_#000] text-base">1</div>
+            <span id="bedrock-podium-1-name" class="font-bold text-xs sm:text-sm mt-2 truncate w-full text-amber-300 normal-case">---</span>
+            <span id="bedrock-podium-1-pts" class="text-[10px] text-amber-300 border border-amber-400/40 px-1.5 py-0.5 mt-1 font-bold">0 PTS</span>
+          </div>
+
+          <div class="flex flex-col items-center w-20 sm:w-28 cursor-pointer" onclick="openPlayerModalFromRank('bedrock', 3)">
+            <div class="h-20 w-20 sm:w-28 overflow-hidden relative mb-2 flex justify-center">
+              <img id="bedrock-podium-3-img" src="https://api.mcheads.org/avatar/LostInMotion/right/192" class="w-full h-full object-contain">
+            </div>
+            <div class="w-full podium-bronze font-black py-1 border-2 shadow-[2px_2px_0px_#000] text-xs">3</div>
+            <span id="bedrock-podium-3-name" class="font-bold text-xs mt-2 truncate w-full normal-case">---</span>
+            <span id="bedrock-podium-3-pts" class="text-[10px] text-slate-400 border border-slate-700 px-1 py-0.5 mt-1">0 PTS</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RULES SECTION WITH INTERACTIVE TOGGLE BUTTON -->
+    <div class="brutalist-card p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <h2 class="text-xl font-black uppercase text-amber-400"><i class="fa-solid fa-gavel"></i> Rules & Guidelines</h2>
+        <button onclick="toggleRulesView()" id="rules-toggle-btn" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black px-4 py-1.5 text-xs font-black uppercase tracking-wider">
+          View Extended Rules
+        </button>
+      </div>
+
+      <!-- SHORTENED RULES -->
+      <div id="shortened-rules-container" class="space-y-3">
+        <h3 class="text-xs font-black uppercase text-amber-300">📌 Quick Rules Overview</h3>
+        <ul class="text-xs sm:text-sm space-y-2 text-slate-300 list-disc pl-5">
+          <li>Every fight is recorded by a Tier Tester.</li>
+          <li>No cheating in any way.</li>
+          <li>You can't refuse screenshares or handcams.</li>
+          <li>Leaderboard placement is 100% score-based.</li>
+        </ul>
+      </div>
+
+      <!-- EXTENDED RULES -->
+      <div id="extended-rules-container" class="hidden space-y-6 pt-2">
+        <div>
+          <h3 class="text-sm font-black uppercase text-sky-400 mb-2">⚔️ How Tiertesting Works</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            To request a tiertest, you must join the Discord Server and create a ticket or get somebody to make you a ticket in the #request-test! channel. You will talk with a staff member about which gamemode you would like to test in. You will either fight the tiertester or the tiertester will watch you fight somebody on the tierlist around the skill you are estimated to be, depending on who is available in your region and timezones. If there is nobody available in your region, you will fight in both regions. If your tiertest doesn't occur within a week or you don't respond after making a ticket, it will be closed. Every fight will be recorded or streamed (on YouTube) by the tiertester so the fights can be reviewed if necessary.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-black uppercase text-emerald-400 mb-2">📊 Placement Mechanics</h3>
+          <ul class="text-xs sm:text-sm space-y-2 text-slate-300 list-disc pl-5">
+            <li>If you lose to your opponent, you will fight somebody lower than their skill if you aren't already on the list.</li>
+            <li>If you tie or barely beat your opponent, you will be placed in the same tier as them.</li>
+            <li>If you beat your opponent by a significant score difference, you will fight someone in the next tier up. If you lose to them by a large score difference, the previous person you fought will fight someone lower than their tier and possibly be moved down if they lose.</li>
+            <li>If you wish to be removed from the leaderboards or a specific gamemode, you can create a ticket and we will label you as "retired" in that mode with your peak tier displaying.</li>
+            <li>If you feel like you are playing with a distraction or internet problems, you can request to pause or cancel the fight at any time.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-black uppercase text-rose-400 mb-2">🚫 What Counts as Cheating</h3>
+          <ul class="text-xs sm:text-sm space-y-2 text-slate-300 list-disc pl-5">
+            <li>Double clicking in any way, including broken buttons.</li>
+            <li>Autoclicking and macros. This includes hitting with 2 buttons or using trigger modification to hit or place with "full pull" and "soft pull", resulting in double clicks.</li>
+            <li>Using clients or any game modification that gives you a direct advantage with cheats such as reach, timer, velocity, hitbox, killaura, etc. Regular clients such as Flarial, Oderso, and Bedrock Render Dragon are allowed. Cinnabar is not because some servers flag it for cheats.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-black uppercase text-amber-400 mb-2">🔍 If You Are Hackusated</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-2">
+            If you are tiertesting and get accused of using a cheat and the tiertester agrees, you will have to prove that you're legit. You'll have to play again with your camera facing your controller while you play, with a CPS display in-game. Depending on the scenario, you may have to share your screen or possibly have your PC checked for hidden cheats.
+          </p>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            If your skill significantly drops during the rematch, you will be labeled as a cheater and removed from any leaderboard placement. We are aware of skill adaptation and inconsistencies in rematches, so we will have several people review the footage to determine if you are a legit player. <em>Because autoclicking and double clicking is a less-serious and easy to spot cheat on controller, we will not punish you for using it outside of tier tests. However, being spotted with any other cheat may impact your chances of being on the leaderboards.</em>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex justify-center pt-3">
+        <a href="https://discord.gg/5dNTzEe8x" target="_blank" class="brutalist-btn bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-6 py-3 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-brands fa-discord text-lg"></i> Join Controller Discord
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
+    const GITHUB_ICONS_BASE = "https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/";
+
+    let appData = { players: [] };
+    let javaRankedCache = [];
+    let bedrockRankedCache = [];
+
+    const iconFilenameMap = {
+      'sword': 'sword.png', 'smp': 'smp.png', 'crystal': 'crystal.png',
+      'mace': 'mace.png', 'uhc': 'uhc.png', 'pot': 'pot.png',
+      'skywars': 'skywars.png', 'nodebuff': 'nodebuff.png',
+      'midfights': 'midfight.png', 'bridging': 'bridging.png'
+    };
+
+    const javaModesList = ['sword', 'smp', 'crystal', 'mace', 'uhc', 'pot'];
+    const bedrockModesList = ['skywars', 'nodebuff', 'midfights', 'bridging'];
+
+    function getModeIconUrl(mode) {
+      return GITHUB_ICONS_BASE + (iconFilenameMap[mode.toLowerCase()] || 'sword.png');
+    }
+
+    function getTierString(tierData) {
+      if (!tierData) return "";
+      return (typeof tierData === 'object' ? tierData.tier : tierData) || "";
+    }
+
+    function isHighTier(tierStr) {
+      if (!tierStr) return false;
+      const t = tierStr.toUpperCase().trim();
+      if (t === 'LOW B') return false; 
+      return t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B');
+    }
+
+    function toggleRulesView() {
+      const shortEl = document.getElementById('shortened-rules-container');
+      const extEl = document.getElementById('extended-rules-container');
+      const btnEl = document.getElementById('rules-toggle-btn');
+
+      if (extEl.classList.contains('hidden')) {
+        extEl.classList.remove('hidden');
+        shortEl.classList.add('hidden');
+        btnEl.textContent = "View Shortened Rules";
+      } else {
+        extEl.classList.add('hidden');
+        shortEl.classList.remove('hidden');
+        btnEl.textContent = "View Extended Rules";
+      }
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}players.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data) appData.players = Object.values(data);
+        }
+      } catch (e) { console.warn('Firebase fetch failed:', e); }
+      renderPodiums();
+    }
+
+    function getRenderUrl(player, platformType) {
+      if (!player || !player.name) return 'https://api.mcheads.org/avatar/LostInMotion/right/192';
+      return platformType === 'bedrock' ? `https://api.mcheads.org/avatar/.${player.name}/right/192` : `https://api.mcheads.org/avatar/${player.name}/right/192`;
+    }
+
+    function calculateJavaPoints(player) {
+      if (!player || !player.tiers || player.retired) return 0;
+      const pointsMap = { 'HIGH S': 100, 'LOW S': 90, 'HIGH A': 80, 'LOW A': 70, 'HIGH B': 60, 'LOW B': 50, 'HIGH C': 40, 'LOW C': 30, 'HIGH D': 20, 'LOW D': 10 };
+      let total = 0;
+      Object.entries(player.tiers).forEach(([mode, rawVal]) => {
+        const cleanMode = mode.toLowerCase().trim();
+        if (javaModesList.includes(cleanMode)) {
+          const tierStr = getTierString(rawVal).toUpperCase().trim();
+          total += pointsMap[tierStr] || 0;
+        }
+      });
+      return Math.round(total);
+    }
+
+    function calculateBedrockPoints(player) {
+      if (!player || !player.tiers || player.retired) return 0;
+      const pointsMap = { 'HIGH S': 100, 'LOW S': 90, 'HIGH A': 80, 'LOW A': 70, 'HIGH B': 60, 'LOW B': 50, 'HIGH C': 40, 'LOW C': 30, 'HIGH D': 20, 'LOW D': 10 };
+      let total = 0;
+      Object.entries(player.tiers).forEach(([mode, rawVal]) => {
+        const cleanMode = mode.toLowerCase().trim();
+        if (bedrockModesList.includes(cleanMode)) {
+          if (cleanMode === 'bridging') return; 
+          const tierStr = getTierString(rawVal).toUpperCase().trim();
+          total += pointsMap[tierStr] || 0;
+        }
+      });
+      return Math.round(total);
+    }
+
+    function calculateBridgingPoints(player) {
+      if (!player || !player.tiers || player.retired) return 0;
+      const pointsMap = { 'HIGH S': 150, 'LOW S': 120, 'HIGH A': 90, 'LOW A': 66, 'HIGH B': 45, 'LOW B': 30, 'HIGH C': 15, 'LOW C': 9, 'HIGH D': 6, 'LOW D': 3 };
+      let total = 0;
+      Object.entries(player.tiers).forEach(([mode, rawVal]) => {
+        if (mode.toLowerCase().trim() === 'bridging') {
+          const tierStr = getTierString(rawVal).toUpperCase().trim();
+          total += pointsMap[tierStr] || 0;
+        }
+      });
+      return Math.round(total);
+    }
+
+    function renderPodiums() {
+      const activePlayers = appData.players || [];
+      
+      const javaActive = activePlayers.filter(p => !p.retired && calculateJavaPoints(p) > 0);
+      javaRankedCache = javaActive.sort((a, b) => calculateJavaPoints(b) - calculateJavaPoints(a));
+
+      [1, 2, 3].forEach((rank) => {
+        const player = javaRankedCache[rank - 1];
+        const imgEl = document.getElementById(`java-podium-${rank}-img`);
+        const nameEl = document.getElementById(`java-podium-${rank}-name`);
+        const ptsEl = document.getElementById(`java-podium-${rank}-pts`);
+
+        if (player) {
+          imgEl.src = getRenderUrl(player, 'java');
+          nameEl.textContent = player.name;
+          ptsEl.textContent = `${calculateJavaPoints(player)} PTS`;
+        } else {
+          imgEl.src = 'https://api.mcheads.org/avatar/LostInMotion/right/192';
+          nameEl.textContent = '---';
+          ptsEl.textContent = '0 PTS';
+        }
+      });
+
+      const bedrockActive = activePlayers.filter(p => !p.retired && (calculateBedrockPoints(p) > 0 || calculateBridgingPoints(p) > 0));
+      bedrockRankedCache = bedrockActive.sort((a, b) => (calculateBedrockPoints(b) + calculateBridgingPoints(b)) - (calculateBedrockPoints(a) + calculateBridgingPoints(a)));
+
+      [1, 2, 3].forEach((rank) => {
+        const player = bedrockRankedCache[rank - 1];
+        const imgEl = document.getElementById(`bedrock-podium-${rank}-img`);
+        const nameEl = document.getElementById(`bedrock-podium-${rank}-name`);
+        const ptsEl = document.getElementById(`bedrock-podium-${rank}-pts`);
+
+        if (player) {
+          imgEl.src = getRenderUrl(player, 'bedrock');
+          nameEl.textContent = player.name;
+          const bPts = calculateBedrockPoints(player);
+          const brPts = calculateBridgingPoints(player);
+          ptsEl.textContent = `${bPts + brPts} PTS`;
+        } else {
+          imgEl.src = 'https://api.mcheads.org/avatar/LostInMotion/right/192';
+          nameEl.textContent = '---';
+          ptsEl.textContent = '0 PTS';
+        }
+      });
+    }
+
+    function openPlayerModalFromRank(category, rankNum) {
+      const cache = category === 'java' ? javaRankedCache : bedrockRankedCache;
+      const player = cache[rankNum - 1];
+      if (player) openPlayerProfileModal(player, category);
+    }
+
+    function openPlayerProfileModal(player, categoryHint = 'java') {
+      if (!player) return;
+      const isBedrockCat = categoryHint === 'bedrock' || (player.tiers && (player.tiers.skywars || player.tiers.nodebuff || player.tiers.midfights || player.tiers.bridging));
+      document.getElementById('modal-avatar').src = getRenderUrl(player, isBedrockCat ? 'bedrock' : 'java');
+      document.getElementById('modal-player-name').textContent = player.name;
+      
+      const javaPts = calculateJavaPoints(player);
+      const bedrockPts = calculateBedrockPoints(player);
+      const bridgePts = calculateBridgingPoints(player);
+
+      document.getElementById('modal-rank-pts').innerHTML = `
+        <span class="text-sky-400">Java: ${javaPts} pts</span> • 
+        <span class="text-emerald-400">Bedrock: ${bedrockPts} pts</span> • 
+        <span class="text-amber-400">Bridging: ${bridgePts} pts</span>
+      `;
+      document.getElementById('modal-region').textContent = `Region: ${player.region || 'North America'}`;
+
+      const gridContainer = document.getElementById('modal-tiers-grid');
+      gridContainer.innerHTML = '';
+
+      if (player.tiers && Object.keys(player.tiers).length > 0) {
+        Object.entries(player.tiers).forEach(([mode, rawVal]) => {
+          const tier = getTierString(rawVal);
+          if (!tier) return;
+          const iconUrl = getModeIconUrl(mode);
+          gridContainer.innerHTML += `
+            <div class="flex items-center justify-between bg-slate-900 border border-slate-700/80 p-2 rounded">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <img src="${iconUrl}" class="w-5 h-5 object-contain flex-shrink-0" onerror="this.src='https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/sword.png'">
+                <span class="text-xs font-bold text-white uppercase truncate">${mode}</span>
+              </div>
+              <span class="bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider">${tier}</span>
+            </div>
+          `;
+        });
+      } else {
+        gridContainer.innerHTML = `<p class="text-xs text-slate-500 italic p-2 col-span-2">No assigned tiers</p>`;
+      }
+
+      document.getElementById('player-profile-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('player-profile-modal').classList.add('hidden');
+    }
+
+    function openFightLogsModal() {
+      const container = document.getElementById('fight-logs-container');
+      container.innerHTML = '';
+      let logsFound = 0;
+
+      (appData.players || []).forEach(player => {
+        if (!player.tiers) return;
+        Object.entries(player.tiers).forEach(([mode, data]) => {
+          if (typeof data === 'object') {
+            logsFound++;
+            const iconUrl = getModeIconUrl(mode);
+            const isHigh = isHighTier(data.tier);
+            
+            let detailsHtml = isHigh ? `
+              <div class="text-right text-[11px] font-mono bg-slate-950 p-2 border border-slate-800 rounded w-full sm:w-auto">
+                <div><span class="text-amber-400">Fight 1:</span> ${data.fight1 || 'N/A'} <span class="text-slate-500">(${data.fight1Tester || 'Tester'})</span></div>
+                <div><span class="text-amber-400">Fight 2:</span> ${data.fight2 || 'N/A'} <span class="text-slate-500">(${data.fight2Tester || 'Tester'})</span></div>
+              </div>
+            ` : `
+              <div class="text-right text-[11px] font-mono bg-slate-950 p-2 border border-slate-800 rounded w-full sm:w-auto">
+                <div><span class="text-amber-400">Score:</span> ${data.score || 'N/A'}</div>
+                <div><span class="text-slate-500">Tester:</span> ${data.tester || 'Tester'}</div>
+              </div>
+            `;
+
+            const videoEmbedHtml = data.youtubeUrl ? `
+              <div class="mt-3 aspect-video w-full rounded overflow-hidden border border-slate-700 bg-slate-950">
+                <iframe src="${data.youtubeUrl}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              </div>
+            ` : '';
+
+            container.innerHTML += `
+              <div class="brutalist-card p-3 bg-slate-900/90 border-amber-500/30 flex flex-col gap-3">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <img src="${getRenderUrl(player, 'java')}" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain">
+                    <div>
+                      <div class="flex items-center gap-1.5 mb-0.5">
+                        <img src="${iconUrl}" class="w-4 h-4 object-contain" onerror="this.style.display='none'">
+                        <h4 class="font-black text-sm text-white">${player.name} <span class="text-amber-400 text-xs">(${mode.toUpperCase()})</span></h4>
+                      </div>
+                      <p class="text-[11px] font-bold text-sky-400">Tier Earned: ${data.tier} <span class="text-slate-400 font-normal">(Prev: ${data.prevTier || 'Unranked'})</span></p>
+                    </div>
+                  </div>
+                  ${detailsHtml}
+                </div>
+                ${videoEmbedHtml}
+              </div>
+            `;
+          }
+        });
+      });
+
+      if (logsFound === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No test logs recorded yet.</p>`;
+      }
+      document.getElementById('fight-logs-modal').classList.remove('hidden');
+    }
+
+    function closeFightLogsModal() {
+      document.getElementById('fight-logs-modal').classList.add('hidden');
+    }
+
+    function searchPlayer() {
+      const query = document.getElementById('player-search-input').value.trim().toLowerCase();
+      const modal = document.getElementById('search-modal');
+      const body = document.getElementById('search-card-body');
+
+      if (!query) { modal.classList.add('hidden'); return; }
+
+      const matches = (appData.players || []).filter(p => p.name.toLowerCase().includes(query));
+      if (matches.length === 0) {
+        body.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No player found matching "${query}"</p>`;
+        modal.classList.remove('hidden'); return;
+      }
+
+      body.innerHTML = matches.map(p => {
+        return `
+          <div onclick="closeSearchModal(); openPlayerProfileModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="brutalist-card p-3 flex items-center justify-between cursor-pointer hover:border-amber-400 bg-slate-900/90">
+            <div class="flex items-center gap-3">
+              <img src="${getRenderUrl(p, 'java')}" class="h-10 w-10 object-contain border border-slate-700 bg-slate-950 p-1">
+              <div>
+                <h4 class="font-black text-sm text-white normal-case">${p.name} ${p.retired ? '<span class="text-[10px] text-amber-500 font-normal">(RETIRED)</span>' : ''}</h4>
+                <p class="text-[10px] text-slate-400 font-mono">Java: ${calculateJavaPoints(p)} pts • Bedrock: ${calculateBedrockPoints(p)} pts</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-amber-400 uppercase">View Profile <i class="fa-solid fa-chevron-right ml-1"></i></span>
+          </div>
+        `;
+      }).join('');
+      modal.classList.remove('hidden');
+    }
+
+    function closeSearchModal() {
+      document.getElementById('search-modal').classList.add('hidden');
+      document.getElementById('player-search-input').value = '';
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
