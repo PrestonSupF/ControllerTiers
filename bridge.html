@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controller PvP | Bedrock Tierlist</title>
-  
+  <title>Controller PvP | Bridging Tierlist & Rubric</title>
+
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,6 +12,7 @@
     body { background-color: #090b0e; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     .brutalist-card { background: #11161d; border: 2px solid #1e293b; box-shadow: 4px 4px 0px #000; }
     .brutalist-btn { background: #1e293b; border: 2px solid #334155; box-shadow: 3px 3px 0px #000; transition: all 0.1s ease; }
+    .brutalist-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0px #000; }
     .bg-tier-S { background-color: #FFD700; color: #000; }
     .bg-tier-A { background-color: #38BDF8; color: #000; }
     .bg-tier-B { background-color: #C0C0C0; color: #000; }
@@ -21,64 +22,152 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
 
-  <!-- TOP HEADER -->
-  <header class="brutalist-card p-3 mb-4 flex items-center justify-between">
+  <!-- TOP HEADER WITH NAVIGATION -->
+  <header class="brutalist-card p-3 mb-6 flex items-center justify-between flex-wrap gap-2">
     <div class="flex items-center gap-3">
-      <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png" alt="Logo" class="h-10 w-10 object-contain">
-      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP - Bedrock</h1>
+      <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png" 
+           alt="Logo" 
+           class="h-10 w-10 object-contain"
+           onerror="this.onerror=null; this.src='https://api.mcheads.org/avatar/LostInMotion/right/192';">
+      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP - Bridging</h1>
     </div>
-    <nav class="flex items-center gap-2">
+
+    <nav class="flex items-center gap-2 flex-wrap">
       <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Home</a>
       <a href="java.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-400">☕ Java</a>
-      <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-emerald-500 text-black">🧱 Bedrock</a>
+      <a href="bedrock.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">🧱 Bedrock</a>
+      <a href="bridge.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-amber-500 text-black">🌉 Bridge</a>
     </nav>
   </header>
 
-  <!-- BEDROCK RULES & BACKUP SERVERS -->
-  <div class="brutalist-card p-6 mb-6">
-    <h2 class="text-xl font-black uppercase mb-4 border-b border-slate-800 pb-2 text-emerald-400"><i class="fa-solid fa-cubes"></i> Bedrock Competitive Rules</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
-      <div class="brutalist-card p-3">
-        <h3 class="font-bold text-white uppercase mb-1">Skywars</h3>
-        <p>Played on Swimgg.club (Hive backup). First to 5 wins (same region) or First to 3 wins on both regions.</p>
-      </div>
-      <div class="brutalist-card p-3">
-        <h3 class="font-bold text-white uppercase mb-1">Nodebuff</h3>
-        <p>Played on Tidalpvp.club (Swimgg.club backup). First to 5 wins (same region) or First to 3 wins on both regions.</p>
-      </div>
-      <div class="brutalist-card p-3">
-        <h3 class="font-bold text-white uppercase mb-1">Midfights</h3>
-        <p>Played on Swimgg.club (Hive backup). First to 3 full match wins (same region) or First to 2 match wins on both regions.</p>
-      </div>
-      <div class="brutalist-card p-3">
-        <h3 class="font-bold text-white uppercase mb-1">Bridging (150 Points Max)</h3>
-        <p>Live tiertest host required. Max 3 minutes per bridge attempt. Scaled rubric up to 150 pts.</p>
-      </div>
-    </div>
-  </div>
+  <!-- BRIDGING FULL RUBRIC SECTION -->
+  <section class="space-y-6 mb-8">
 
-  <div class="brutalist-card p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
-    <div class="flex items-center gap-2">
-      <label class="text-xs font-bold uppercase text-slate-400">Mode:</label>
-      <select id="mode-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase text-white">
-        <option value="skywars">Skywars</option>
-        <option value="nodebuff">Nodebuff</option>
-        <option value="midfights">Midfights</option>
-        <option value="bridging">Bridging</option>
-      </select>
+    <!-- SCALED POINT THRESHOLDS (MAX 150 PTS) -->
+    <div class="brutalist-card p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2">
+        <h2 class="text-lg font-black uppercase text-amber-400"><i class="fa-solid fa-chart-line"></i> Bridging Point Thresholds</h2>
+        <span class="text-xs font-mono font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded uppercase">Max Pts: 150</span>
+      </div>
+      
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-amber-300 font-black">High S:</span>
+          <span class="text-white font-bold">123–150 pts</span>
+        </div>
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-amber-300 font-black">Low S:</span>
+          <span class="text-white font-bold">93–120 pts</span>
+        </div>
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-sky-300 font-black">High A:</span>
+          <span class="text-white font-bold">69–90 pts</span>
+        </div>
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-sky-300 font-black">Low A:</span>
+          <span class="text-white font-bold">48–66 pts</span>
+        </div>
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-slate-300 font-black">High B:</span>
+          <span class="text-white font-bold">33–45 pts</span>
+        </div>
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-slate-300 font-black">Low B:</span>
+          <span class="text-white font-bold">18–30 pts</span>
+        </div>
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-amber-600 font-black">High C:</span>
+          <span class="text-white font-bold">12–15 pts</span>
+        </div>
+        <div class="bg-slate-900 p-2.5 border border-slate-800 flex justify-between items-center">
+          <span class="text-amber-600 font-black">Low C:</span>
+          <span class="text-white font-bold">3–9 pts</span>
+        </div>
+      </div>
     </div>
-    <div class="flex items-center gap-2">
-      <label class="text-xs font-bold uppercase text-slate-400">Region:</label>
-      <select id="region-select" onchange="renderTierlist()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-2 uppercase text-white">
-        <option value="ALL">Global (All)</option>
-        <option value="NA">North America (NA)</option>
-        <option value="EU">Europe (EU)</option>
-        <option value="AS">Asia (AS)</option>
-      </select>
-    </div>
-  </div>
 
-  <div id="tiers-container" class="space-y-4 mb-8"></div>
+    <!-- FULL BRIDGING RUBRIC MATRIX -->
+    <div class="brutalist-card p-6 overflow-x-auto">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2 mb-4">
+        <h2 class="text-lg font-black uppercase text-amber-400"><i class="fa-solid fa-table"></i> Official Bridging Rubric</h2>
+        <span class="text-[11px] font-mono text-slate-400">Live Tiertest Host Required • Max 3 Mins Per Attempt</span>
+      </div>
+
+      <table class="w-full text-left text-xs text-slate-300 border-collapse min-w-[750px]">
+        <thead>
+          <tr class="bg-slate-900 text-amber-300 border-b border-slate-800 font-black uppercase">
+            <th class="p-3 border border-slate-800 w-28">Category Pts</th>
+            <th class="p-3 border border-slate-800">Icy Bridge</th>
+            <th class="p-3 border border-slate-800">Icy Turning</th>
+            <th class="p-3 border border-slate-800">Down Bridging & Pole</th>
+            <th class="p-3 border border-slate-800">Straight Bridging</th>
+            <th class="p-3 border border-slate-800">Double Bridging</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800 font-mono text-[11px]">
+          <tr class="hover:bg-slate-900/40">
+            <td class="p-3 border border-slate-800 font-black text-amber-400">5 Points</td>
+            <td class="p-3 border border-slate-800">Icy<br>25 Blocks<br>Any Method</td>
+            <td class="p-3 border border-slate-800">V1 Turns<br>x4 In A Row<br>Sprint w Strafe</td>
+            <td class="p-3 border border-slate-800">Down Bridge<br>x3<br>Any Method</td>
+            <td class="p-3 border border-slate-800">1x Xylen<br>3x<br>Sprint Nonstop</td>
+            <td class="p-3 border border-slate-800">Double Bridge<br>Walk/Sprint<br>30 Blocks; 2 Misses</td>
+          </tr>
+          <tr class="hover:bg-slate-900/40">
+            <td class="p-3 border border-slate-800 font-black text-amber-400">10 Points</td>
+            <td class="p-3 border border-slate-800">Icy<br>40 Blocks<br>Sprint w Strafes</td>
+            <td class="p-3 border border-slate-800">V2 Turns<br>x6 In A Row<br>Sprint w Strafe</td>
+            <td class="p-3 border border-slate-800">Alternating Pole<br>x5 Poles<br>Nonstop</td>
+            <td class="p-3 border border-slate-800">2x Xylen<br>3x<br>Sprint Nonstop</td>
+            <td class="p-3 border border-slate-800">Double Bridge<br>Walk/Sprint (faster)<br>40 Blocks; 3 Misses</td>
+          </tr>
+          <tr class="hover:bg-slate-900/40">
+            <td class="p-3 border border-slate-800 font-black text-amber-400">20 Points</td>
+            <td class="p-3 border border-slate-800">Icy<br>48 Blocks<br>Sprint No/Light Strafe</td>
+            <td class="p-3 border border-slate-800">x8 In A Row<br>V2 Turns<br>Sprint Light Strafe</td>
+            <td class="p-3 border border-slate-800">2 Block Pole<br>x3 Pole<br>Any Pole Method</td>
+            <td class="p-3 border border-slate-800">C-Span<br>x6<br>Every 2 Jumps</td>
+            <td class="p-3 border border-slate-800">Double Warped<br>Sprint<br>52 Blocks 2 Miss</td>
+          </tr>
+          <tr class="hover:bg-slate-900/40">
+            <td class="p-3 border border-slate-800 font-black text-amber-400">30 Points</td>
+            <td class="p-3 border border-slate-800">Icy Flix<br>x2<br>Sprint No/Light Strafe</td>
+            <td class="p-3 border border-slate-800">Freestyle<br>120 Blocks & 7+ Bridges<br>Sprint Light Strafe</td>
+            <td class="p-3 border border-slate-800">3 Block Pole<br>x2 Pole<br>Any Pole Method</td>
+            <td class="p-3 border border-slate-800">Straight Flix<br>x6<br>Sprint Light Strafe</td>
+            <td class="p-3 border border-slate-800">Alternating Whoop<br>x4<br>Sprint</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- BRIDGING-ONLY TIERLIST SECTION -->
+  <section class="brutalist-card p-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+      <div class="flex items-center gap-2">
+        <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/icons/bridging.png" class="w-6 h-6 object-contain" onerror="this.style.display='none'">
+        <h2 class="text-xl font-black uppercase text-amber-400">Bridging Tierlist</h2>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-bold uppercase text-slate-400">Region:</label>
+        <select id="region-select" onchange="renderBridgingLeaderboard()" class="bg-slate-900 border border-slate-700 text-xs font-bold p-1.5 uppercase text-white focus:outline-none">
+          <option value="ALL">Global (All)</option>
+          <option value="NA">North America (NA)</option>
+          <option value="EU">Europe (EU)</option>
+          <option value="AS">Asia (AS)</option>
+          <option value="SA">South America (SA)</option>
+          <option value="OCE">Oceania (OCE)</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="bridging-tierlist-container" class="space-y-4">
+      <p class="text-xs text-slate-500 italic">Loading bridging rankings...</p>
+    </div>
+  </section>
 
   <script>
     const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
@@ -97,13 +186,12 @@
           if (data) appData.players = Object.values(data);
         }
       } catch (e) { console.warn(e); }
-      renderTierlist();
+      renderBridgingLeaderboard();
     }
 
-    function renderTierlist() {
-      const selectedMode = document.getElementById('mode-select').value.toLowerCase().trim();
+    function renderBridgingLeaderboard() {
       const selectedRegion = document.getElementById('region-select').value.toUpperCase().trim();
-      const container = document.getElementById('tiers-container');
+      const container = document.getElementById('bridging-tierlist-container');
       container.innerHTML = '';
 
       const tierDefs = [
@@ -121,19 +209,21 @@
         subTiers.forEach(sub => {
           const matchingPlayers = (appData.players || []).filter(p => {
             if (!p.tiers || p.retired) return false;
-            const modeKey = Object.keys(p.tiers).find(k => k.toLowerCase().trim() === selectedMode);
-            const playerTierVal = modeKey ? getTierString(p.tiers[modeKey]).trim().toLowerCase() : '';
-            const matchesMode = playerTierVal === sub.toLowerCase();
+            const bridgeKey = Object.keys(p.tiers).find(k => k.toLowerCase().trim() === 'bridging');
+            if (!bridgeKey) return false;
+
+            const playerTierVal = getTierString(p.tiers[bridgeKey]).trim().toLowerCase();
+            const matchesTier = playerTierVal === sub.toLowerCase();
             const matchesRegion = selectedRegion === 'ALL' || (p.region || 'NA').toUpperCase() === selectedRegion;
-            return matchesMode && matchesRegion;
+            return matchesTier && matchesRegion;
           });
 
           let playerCards = matchingPlayers.map(p => `
             <div class="brutalist-card p-2 flex items-center gap-3 bg-slate-900/90 w-44">
-              <img src="https://api.mcheads.org/avatar/.${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain">
+              <img src="https://api.mcheads.org/avatar/.${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain" onerror="this.src='https://api.mcheads.org/avatar/LostInMotion/right/192'">
               <div class="overflow-hidden">
                 <div class="font-bold text-xs truncate text-white normal-case">${p.name}</div>
-                <div class="text-[10px] text-slate-400 font-mono">BEDROCK • ${p.region || 'NA'}</div>
+                <div class="text-[10px] text-amber-400 font-mono">BRIDGING • ${p.region || 'NA'}</div>
               </div>
             </div>
           `).join('');
