@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controller PvP | Admin Dashboard</title>
+
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background-color: #090b0e; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .brutalist-card { background: #11161d; border: 2px solid #1e293b; box-shadow: 4px 4px 0px #000; }
+    .brutalist-btn { background: #1e293b; border: 2px solid #334155; box-shadow: 3px 3px 0px #000; transition: all 0.1s ease; }
+    .brutalist-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0px #000; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-2 sm:p-4 max-w-7xl mx-auto">
+
+  <!-- TOP HEADER -->
+  <header class="brutalist-card p-3 mb-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="https://raw.githubusercontent.com/PrestonSupF/ControllerTiers/refs/heads/main/controller_trans.png" alt="Logo" class="h-10 w-10 object-contain">
+      <h1 class="text-xl font-black tracking-wider uppercase hidden sm:block">Controller PvP - Admin Dashboard</h1>
+    </div>
+
+    <nav class="flex items-center gap-2">
+      <a href="index.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider">Home</a>
+      <a href="bridge.html" class="brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">Bridge</a>
+      <button id="sign-out-btn" onclick="signOutAdmin()" class="hidden brutalist-btn px-3 py-1 text-xs font-bold uppercase tracking-wider bg-rose-600 hover:bg-rose-500 text-white"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+    </nav>
+  </header>
+
+  <!-- ACCESS GATE SCREEN -->
+  <div id="auth-gate-modal" class="flex-grow flex items-center justify-center p-4">
+    <div class="brutalist-card bg-[#11161d] w-full max-w-md p-6 border-amber-400/80 shadow-[6px_6px_0px_#000]">
+      <h2 class="text-lg font-black uppercase text-amber-400 mb-1"><i class="fa-solid fa-lock"></i> Admin Authentication</h2>
+      <p class="text-xs text-slate-400 mb-4">Please enter your Minecraft username and access code to proceed.</p>
+      
+      <form onsubmit="authenticateAdmin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Minecraft Username</label>
+          <input type="text" id="tester-username-input" required placeholder="e.g. spinninback" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Access Code</label>
+          <input type="password" id="admin-passcode-input" required placeholder="Enter code..." class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
+        </div>
+        <button type="submit" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase px-4 py-2.5 w-full">Access Panel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN MANAGEMENT CONTAINER -->
+  <main id="admin-panel-container" class="hidden grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- ADD / EDIT PLAYER FORM -->
+    <section class="brutalist-card p-4 sm:p-6 lg:col-span-1 h-fit">
+      <h2 id="form-heading" class="text-lg font-black uppercase text-amber-400 mb-4 border-b border-slate-800 pb-2">Add / Edit Player</h2>
+      
+      <form id="player-form" onsubmit="savePlayer(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Minecraft Username</label>
+          <input type="text" id="admin-name" required placeholder="e.g. Tynza" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Region</label>
+          <select id="admin-region" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm text-white uppercase font-bold focus:outline-none">
+            <option value="NA">NA</option>
+            <option value="EU">EU</option>
+            <option value="AS">AS</option>
+            <option value="SA">SA</option>
+            <option value="OCE">OCE</option>
+          </select>
+        </div>
+
+        <div class="space-y-3 pt-2 border-t border-slate-800">
+          <h3 class="text-xs font-black uppercase text-slate-400">Assign Mode Tiers</h3>
+          
+          <div class="space-y-2">
+            <div>
+              <label class="block text-[10px] text-sky-400 font-bold uppercase mb-1">Select Game Mode</label>
+              <select id="active-mode-select" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+                <optgroup label="☕ Java Modes">
+                  <option value="sword">Sword</option>
+                  <option value="smp">SMP</option>
+                  <option value="crystal">Crystal</option>
+                  <option value="mace">Mace</option>
+                  <option value="uhc">UHC</option>
+                  <option value="pot">Pot</option>
+                </optgroup>
+                <optgroup label="🧱 Bedrock & Special Modes">
+                  <option value="skywars">Skywars</option>
+                  <option value="nodebuff">Nodebuff</option>
+                  <option value="midfights">Midfights</option>
+                  <option value="bridging">Bridging (150 Pts Max)</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] text-amber-400 font-bold uppercase mb-1">Select Tier Rank</label>
+              <select id="active-tier-select" onchange="checkTierSelection()" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+                <option value="">-- No Tier / Unassigned --</option>
+                <option value="High S">High S</option>
+                <option value="Low S">Low S</option>
+                <option value="High A">High A</option>
+                <option value="Low A">Low A</option>
+                <option value="High B">High B</option>
+                <option value="Low B">Low B</option>
+                <option value="High C">High C</option>
+                <option value="Low C">Low C</option>
+                <option value="High D">High D</option>
+                <option value="Low D">Low D</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Previous Evaluation Tier</label>
+              <select id="active-prev-tier" class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white uppercase font-bold focus:outline-none">
+                <option value="Unranked">Unranked</option>
+                <option value="High S">High S</option>
+                <option value="Low S">Low S</option>
+                <option value="High A">High A</option>
+                <option value="Low A">Low A</option>
+                <option value="High B">High B</option>
+                <option value="Low B">Low B</option>
+                <option value="High C">High C</option>
+                <option value="Low C">Low C</option>
+                <option value="High D">High D</option>
+                <option value="Low D">Low D</option>
+              </select>
+            </div>
+
+            <!-- DYNAMIC LOW TEST SCORE INPUT -->
+            <div id="low-test-score-container" class="space-y-1 p-2 bg-slate-900 border border-slate-800 rounded mt-2">
+              <label class="block text-[9px] text-slate-300 uppercase font-bold">Fight Score (Low Test)</label>
+              <input type="text" id="low-fight-score" placeholder="e.g. 3-0" class="w-full bg-slate-950 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+            </div>
+
+            <!-- DYNAMIC HIGH TEST SCORES & TESTERS -->
+            <div id="high-test-scores-container" class="hidden space-y-2.5 p-2.5 bg-amber-950/20 border border-amber-500/40 rounded mt-2">
+              <span class="text-[10px] text-amber-400 font-black uppercase block"><i class="fa-solid fa-trophy"></i> High Test Scores Required (High B+)</span>
+              
+              <div>
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 1 Tester IGN</label>
+                <input type="text" id="fight-1-tester" placeholder="e.g. spinninback" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 1 Score</label>
+                <input type="text" id="fight-1-score" placeholder="e.g. 3-1" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+
+              <div class="pt-1 border-t border-amber-500/20">
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 2 Tester IGN</label>
+                <input type="text" id="fight-2-tester" placeholder="e.g. Tynza" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Fight 2 Score</label>
+                <input type="text" id="fight-2-score" placeholder="e.g. 3-2" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+              </div>
+            </div>
+
+            <!-- OPTIONAL YOUTUBE LINK -->
+            <div class="pt-2 border-t border-slate-800">
+              <label class="block text-[10px] text-red-400 uppercase font-bold mb-1"><i class="fa-brands fa-youtube"></i> YouTube Match Link (Optional)</label>
+              <input type="url" id="youtube-match-link" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-900 border border-slate-700 p-2 text-xs text-white focus:outline-none">
+            </div>
+
+            <button type="button" onclick="assignTierToPlayer()" class="brutalist-btn bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase px-3 py-2 w-full mt-2">
+              <i class="fa-solid fa-plus"></i> Set Mode Tier
+            </button>
+          </div>
+
+          <div class="mt-3">
+            <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Current Assigned Tiers:</label>
+            <div id="assigned-tiers-preview" class="flex flex-wrap gap-1.5 p-2 bg-slate-900/80 border border-slate-800 min-h-[44px]">
+              <span class="text-[10px] text-slate-500 italic">No modes assigned yet</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <label id="retirement-container" class="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer">
+            <input type="checkbox" id="admin-retired" class="w-4 h-4 accent-amber-400"> Retired Player (Overall / Eligible Modes)
+          </label>
+          <p id="retirement-warning" class="text-[10px] text-amber-500 mt-1 hidden">⚠️ Player must hold High B Tier or higher in at least one mode to retire.</p>
+        </div>
+
+        <!-- BLACKLIST SECTION CONTROLS -->
+        <div class="pt-3 border-t border-slate-800 space-y-3 bg-rose-950/20 p-3 border border-rose-900/40 rounded">
+          <h3 class="text-xs font-black uppercase text-rose-400"><i class="fa-solid fa-ban"></i> Blacklist / Ban Player</h3>
+          
+          <label class="flex items-center gap-2 text-xs font-bold text-rose-300 cursor-pointer">
+            <input type="checkbox" id="admin-blacklisted" onchange="toggleBlacklistFields()" class="w-4 h-4 accent-rose-500"> Blacklist Player
+          </label>
+
+          <div id="blacklist-inputs-container" class="hidden space-y-2 pt-1">
+            <div>
+              <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Discord Username</label>
+              <input type="text" id="blacklist-discord" placeholder="e.g. prestonsupf" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Ban Duration</label>
+              <input type="text" id="blacklist-duration" placeholder="e.g. Permanent / 30 Days" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-300 uppercase font-bold mb-0.5">Reason for Ban</label>
+              <textarea id="blacklist-reason" placeholder="e.g. Caught using autoclicker & refusing screenshare" class="w-full bg-slate-900 border border-slate-700 p-1.5 text-xs text-white focus:outline-none h-16 resize-none"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-3">
+          <button type="submit" class="brutalist-btn bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase px-4 py-2.5 w-full">Save Player to DB</button>
+          <button type="button" onclick="resetForm()" class="brutalist-btn bg-slate-800 text-slate-300 font-bold text-xs uppercase px-3 py-2.5">Reset</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- PLAYER LIST DATABASE MANAGEMENT -->
+    <section class="brutalist-card p-4 sm:p-6 lg:col-span-2">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
+        <h2 class="text-lg font-black uppercase text-amber-400">Registered Roster</h2>
+        <input type="text" id="roster-search" onkeyup="filterRoster()" placeholder="Filter roster..." class="bg-slate-900 border border-slate-700 px-3 py-1 text-xs text-white focus:outline-none">
+      </div>
+
+      <div id="roster-list" class="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+        <p class="text-xs text-slate-500 italic">Loading players from database...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const FIREBASE_DB_URL = "https://controller-tiers-default-rtdb.firebaseio.com/";
+    const ADMIN_PASSCODE = "controller123";
+    
+    const LOW_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1563983888798318636/6dZ0Y5UAD3kAHKRfvEJH4ZZM8ogEBAp4d958UP8Qcl7PUmzNEE_kTW1hzHZmhQMBwVK5";
+    const HIGH_TEST_WEBHOOK_URL = "https://discord.com/api/webhooks/1568868723220152353/Y0nZHLLFMlSqhRLXSc8cGA7Vrlsgw005lLTjWmnVePxMHei1V290togrwgxhuAlocLsj";
+    const BLACKLIST_WEBHOOK_URL = "https://discord.com/api/webhooks/1570990127709159579/58rfahSfjRkagBhiwq9GkLfv3UtBylhy26bLeziln71gAtdvnB7fUDoEBaIjDP6mpEov";
+
+    let playersMap = {};
+    let currentEditingTiers = {}; 
+    let currentTesterUsername = "";
+
+    function authenticateAdmin(event) {
+      event.preventDefault();
+      const usernameInput = document.getElementById('tester-username-input').value.trim();
+      const passcodeInput = document.getElementById('admin-passcode-input').value.trim();
+
+      if (passcodeInput !== ADMIN_PASSCODE) { alert("Incorrect access code!"); return; }
+      if (!usernameInput) { alert("Please enter your Minecraft username."); return; }
+
+      currentTesterUsername = usernameInput;
+      document.getElementById('auth-gate-modal').classList.add('hidden');
+      const panel = document.getElementById('admin-panel-container');
+      panel.classList.remove('hidden');
+      panel.classList.add('grid');
+      document.getElementById('sign-out-btn').classList.remove('hidden');
+      loadAdminData();
+    }
+
+    function signOutAdmin() {
+      currentTesterUsername = "";
+      document.getElementById('admin-panel-container').classList.add('hidden');
+      document.getElementById('admin-panel-container').classList.remove('grid');
+      document.getElementById('sign-out-btn').classList.add('hidden');
+      document.getElementById('auth-gate-modal').classList.remove('hidden');
+    }
+
+    async function loadAdminData() {
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}players.json`);
+        if (res.ok) { playersMap = (await res.json()) || {}; }
+      } catch (e) { console.warn(e); }
+      renderRoster();
+      checkRetirementEligibility();
+    }
+
+    function renderRoster() {
+      const container = document.getElementById('roster-list');
+      const keys = Object.keys(playersMap);
+      if (keys.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic">No players registered in database yet.</p>`;
+        return;
+      }
+      container.innerHTML = keys.map(key => {
+        const p = playersMap[key];
+        let tierSummary = '';
+        if (p.tiers) {
+          tierSummary = Object.entries(p.tiers).map(([m, data]) => {
+            const tierName = typeof data === 'object' ? data.tier : data;
+            return `<span class="bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-400 uppercase">${m}: ${tierName}</span>`;
+          }).join(' ');
+        }
+        let statusBadge = '';
+        if (p.blacklisted) statusBadge += '<span class="text-[10px] text-rose-500 font-bold ml-1">(BLACKLISTED)</span>';
+        if (p.retired) statusBadge += '<span class="text-[10px] text-amber-500 font-bold ml-1">(RETIRED)</span>';
+
+        return `
+          <div class="brutalist-card p-3 flex items-center justify-between gap-3 bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <img src="https://api.mcheads.org/avatar/${p.name}/right/192" class="h-10 w-10 border border-slate-700 bg-slate-950 object-contain" onerror="this.src='https://api.mcheads.org/avatar/LostInMotion/right/192'">
+              <div>
+                <h4 class="font-black text-sm text-white">${p.name} ${statusBadge}</h4>
+                <p class="text-[10px] text-slate-400 font-mono">Region: ${p.region || 'NA'}</p>
+                <div class="flex flex-wrap gap-1 mt-1">${tierSummary}</div>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="editPlayer('${key}')" class="brutalist-btn bg-sky-600 text-white px-3 py-1 text-xs font-bold uppercase">Edit</button>
+              <button onclick="deletePlayer('${key}')" class="brutalist-btn bg-rose-600 text-white px-3 py-1 text-xs font-bold uppercase">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function checkTierSelection() {
+      const tierVal = document.getElementById('active-tier-select').value;
+      const highScoresContainer = document.getElementById('high-test-scores-container');
+      const lowScoreContainer = document.getElementById('low-test-score-container');
+      
+      if (isHighTier(tierVal)) {
+        highScoresContainer.classList.remove('hidden');
+        lowScoreContainer.classList.add('hidden');
+      } else {
+        highScoresContainer.classList.add('hidden');
+        lowScoreContainer.classList.remove('hidden');
+      }
+    }
+
+    function isHighTier(tierStr) {
+      if (!tierStr) return false;
+      const t = tierStr.toUpperCase().trim();
+      if (t === 'LOW B') return false; 
+      return t.includes('HIGH S') || t.includes('LOW S') || t.includes('HIGH A') || t.includes('LOW A') || t.includes('HIGH B');
+    }
+
+    function checkRetirementEligibility() {
+      // Check if user has at least one High B Tier or higher across currentEditingTiers
+      let qualifies = false;
+      Object.values(currentEditingTiers).forEach(data => {
+        const tierStr = (typeof data === 'object' ? data.tier : data) || "";
+        if (isHighTier(tierStr) || tierStr.toUpperCase().includes('HIGH B')) {
+          qualifies = true;
+        }
+      });
+
+      const checkbox = document.getElementById('admin-retired');
+      const warning = document.getElementById('retirement-warning');
+      
+      if (!qualifies) {
+        checkbox.disabled = true;
+        checkbox.checked = false;
+        warning.classList.remove('hidden');
+      } else {
+        checkbox.disabled = false;
+        warning.classList.add('hidden');
+      }
+    }
+
+    function toggleBlacklistFields() {
+      const isChecked = document.getElementById('admin-blacklisted').checked;
+      const container = document.getElementById('blacklist-inputs-container');
+      if (isChecked) {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    function parseYouTubeEmbedUrl(url) {
+      if (!url) return null;
+      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+      return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : url;
+    }
+
+    function assignTierToPlayer() {
+      const mode = document.getElementById('active-mode-select').value;
+      const tier = document.getElementById('active-tier-select').value;
+      const prevTier = document.getElementById('active-prev-tier').value;
+      const lowScore = document.getElementById('low-fight-score').value.trim();
+      const fight1Tester = document.getElementById('fight-1-tester').value.trim() || currentTesterUsername;
+      const fight1Score = document.getElementById('fight-1-score').value.trim();
+      const fight2Tester = document.getElementById('fight-2-tester').value.trim() || currentTesterUsername;
+      const fight2Score = document.getElementById('fight-2-score').value.trim();
+      const rawYtUrl = document.getElementById('youtube-match-link').value.trim();
+
+      if (!tier) {
+        delete currentEditingTiers[mode];
+      } else {
+        currentEditingTiers[mode] = {
+          tier, prevTier,
+          tester: currentTesterUsername,
+          score: !isHighTier(tier) ? lowScore : null,
+          fight1Tester: isHighTier(tier) ? fight1Tester : null,
+          fight1: isHighTier(tier) ? fight1Score : null,
+          fight2Tester: isHighTier(tier) ? fight2Tester : null,
+          fight2: isHighTier(tier) ? fight2Score : null,
+          youtubeUrl: parseYouTubeEmbedUrl(rawYtUrl)
+        };
+      }
+      renderAssignedPreview();
+      checkRetirementEligibility();
+      document.getElementById('active-tier-select').value = "";
+      document.getElementById('low-fight-score').value = "";
+      document.getElementById('youtube-match-link').value = "";
+      document.getElementById('high-test-scores-container').classList.add('hidden');
+      document.getElementById('low-test-score-container').classList.remove('hidden');
+    }
+
+    function renderAssignedPreview() {
+      const container = document.getElementById('assigned-tiers-preview');
+      const entries = Object.entries(currentEditingTiers);
+      if (entries.length === 0) {
+        container.innerHTML = `<span class="text-[10px] text-slate-500 italic">No modes assigned yet</span>`;
+        return;
+      }
+      container.innerHTML = entries.map(([mode, data]) => `
+        <span class="bg-slate-950 border border-slate-700 px-2 py-1 rounded text-[10px] font-bold text-white">
+          <span class="text-amber-400 uppercase">${mode}:</span> ${data.tier}
+          <button type="button" onclick="delete currentEditingTiers['${mode}']; renderAssignedPreview(); checkRetirementEligibility();" class="text-rose-400 ml-1"><i class="fa-solid fa-xmark"></i></button>
+        </span>
+      `).join('');
+    }
+
+    async function sendBlacklistWebhook(playerData) {
+      if (!playerData.blacklisted) return;
+      const bustUrl = `https://api.mcheads.org/avatar/${playerData.name}/right/192`;
+      
+      const payload = {
+        embeds: [{
+          title: "🚨 PLAYER BLACKLISTED 🚨",
+          color: 15158332, // Red embed color
+          thumbnail: { url: bustUrl },
+          fields: [
+            { name: "Minecraft IGN", value: playerData.name, inline: true },
+            { name: "Discord Username", value: playerData.blacklistDiscord || "N/A", inline: true },
+            { name: "Ban Duration", value: playerData.blacklistDuration || "Permanent", inline: true },
+            { name: "Reason", value: playerData.blacklistReason || "No reason provided.", inline: false }
+          ],
+          footer: { text: "Controller PvP Security Division" },
+          timestamp: new Date().toISOString()
+        }]
+      };
+
+      try {
+        await fetch(BLACKLIST_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn("Failed to dispatch blacklist webhook:", e);
+      }
+    }
+
+    async function savePlayer(event) {
+      event.preventDefault();
+      const name = document.getElementById('admin-name').value.trim();
+      const region = document.getElementById('admin-region').value;
+      const retired = document.getElementById('admin-retired').checked;
+      
+      const blacklisted = document.getElementById('admin-blacklisted').checked;
+      const blacklistDiscord = document.getElementById('blacklist-discord').value.trim();
+      const blacklistDuration = document.getElementById('blacklist-duration').value.trim();
+      const blacklistReason = document.getElementById('blacklist-reason').value.trim();
+
+      const playerObj = { 
+        name, region, retired, 
+        blacklisted, blacklistDiscord, blacklistDuration, blacklistReason,
+        tiers: currentEditingTiers 
+      };
+
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}players/${name.toLowerCase()}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(playerObj)
+        });
+        if (res.ok) {
+          if (blacklisted) {
+            await sendBlacklistWebhook(playerObj);
+          }
+          alert(`Successfully saved player: ${name}`);
+          document.getElementById('player-form').reset();
+          currentEditingTiers = {};
+          document.getElementById('blacklist-inputs-container').classList.add('hidden');
+          renderAssignedPreview();
+          loadAdminData();
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function editPlayer(key) {
+      const p = playersMap[key];
+      if (!p) return;
+      document.getElementById('admin-name').value = p.name;
+      document.getElementById('admin-region').value = p.region || 'NA';
+      document.getElementById('admin-retired').checked = !!p.retired;
+      
+      const blacklistedCheckbox = document.getElementById('admin-blacklisted');
+      blacklistedCheckbox.checked = !!p.blacklisted;
+      document.getElementById('blacklist-discord').value = p.blacklistDiscord || '';
+      document.getElementById('blacklist-duration').value = p.blacklistDuration || '';
+      document.getElementById('blacklist-reason').value = p.blacklistReason || '';
+      
+      if (p.blacklisted) {
+        document.getElementById('blacklist-inputs-container').classList.remove('hidden');
+      } else {
+        document.getElementById('blacklist-inputs-container').classList.add('hidden');
+      }
+
+      currentEditingTiers = p.tiers ? JSON.parse(JSON.stringify(p.tiers)) : {};
+      renderAssignedPreview();
+      checkRetirementEligibility();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deletePlayer(key) {
+      if (!confirm(`Delete ${key}?`)) return;
+      await fetch(`${FIREBASE_DB_URL}players/${key}.json`, { method: 'DELETE' });
+      loadAdminData();
+    }
+  </script>
+</body>
+</html>
